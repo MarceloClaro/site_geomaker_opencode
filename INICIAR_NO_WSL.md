@@ -2,6 +2,8 @@
 
 Este ZIP contém o site, a Terra Antiga em português, o código do TouchTerrain_for_CAGEO e os instaladores necessários. Nginx serve o museu em `http://localhost:8080` e Gunicorn executa o TouchTerrain em `http://localhost:8081`.
 
+> **Caminho mais simples**: se você tem acesso à internet e não recebeu um ZIP, use o instalador de um único comando descrito na seção "Instalação para quem nunca usou o terminal" do `README.md` — ele baixa tudo automaticamente, sem precisar extrair ZIP manualmente. Este documento continua válido para quem recebeu o pacote como ZIP (ex.: pen-drive, e-mail, rede sem internet no momento da instalação).
+
 ## 1. Instalar o WSL
 
 No PowerShell do Windows, como administrador:

@@ -1,3 +1,8 @@
+# Referência/documentação — o instalador (wsl/setup.sh) gera esta unidade
+# automaticamente com os valores corretos do seu usuário e caminhos. A
+# variável EE_PROJECT (projeto do Google Cloud para Earth Engine) é
+# específica de cada instalação e configurada por
+# wsl/autenticar-earthengine.sh, não pelo instalador principal.
 [Unit]
 Description=Museu Geomaker - TouchTerrain local
 After=network-online.target
@@ -5,10 +10,10 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=marceloclaro
-Group=marceloclaro
+User=SEU_USUARIO_LINUX
+Group=SEU_USUARIO_LINUX
 WorkingDirectory=/opt/geomaker/touchterrain
-Environment=HOME=/home/marceloclaro
+Environment=HOME=/home/SEU_USUARIO_LINUX
 Environment=PYTHONPATH=/opt/geomaker/touchterrain
 Environment=TOUCHTERRAIN_TMP_FOLDER=/opt/geomaker/data/tmp
 Environment=TOUCHTERRAIN_DOWNLOADS_FOLDER=/opt/geomaker/data/downloads
@@ -16,7 +21,6 @@ Environment=TOUCHTERRAIN_PREVIEWS_FOLDER=/opt/geomaker/data/previews
 Environment=TOUCHTERRAIN_GOOGLE_MAPS_KEY_FILE=/opt/geomaker/data/GoogleMapsKey.txt
 Environment=TOUCHTERRAIN_GA_ID=
 Environment=TOUCHTERRAIN_MAX_CELLS=4000000
-Environment=EE_PROJECT=gen-lang-client-0361234202
 ExecStart=/opt/geomaker/venv/bin/gunicorn --workers 2 --threads 4 --timeout 600 --bind 0.0.0.0:8081 touchterrain.server.TouchTerrain_app:app
 Restart=on-failure
 RestartSec=5

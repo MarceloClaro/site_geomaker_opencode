@@ -1,6 +1,90 @@
 # Museu Escolar Itinerante Geomaker — site
 
-Pacote funcional e responsivo com site estático, Terra Antiga em português e servidor local do TouchTerrain. A visualização básica pode ser aberta em qualquer hospedagem HTML; o pacote WSL instala a experiência completa no Windows.
+Pacote funcional e responsivo com site estático, Terra Antiga em português, servidor local do TouchTerrain e terminal com IA (Geólogo Digital). A visualização básica pode ser aberta em qualquer hospedagem HTML; o instalador de um único comando entrega a experiência completa no Windows via WSL.
+
+## Instalação para quem nunca usou o terminal (passo a passo)
+
+Estas instruções não exigem conhecimento técnico. Siga na ordem, sem pular etapas. No total leva de 15 a 30 minutos, a maior parte é apenas espera.
+
+### Parte 1 — Instalar o WSL (só na primeira vez, se seu computador ainda não tem)
+
+O WSL é um recurso do Windows que permite rodar programas de Linux. Se você não sabe se já tem, siga estes passos — não tem problema repetir se já estiver instalado.
+
+1. Clique no menu **Iniciar** do Windows, digite `PowerShell`, clique com o botão direito em **Windows PowerShell** e escolha **Executar como administrador**.
+2. Uma janela azul vai abrir pedindo confirmação — clique em **Sim**.
+3. Digite exatamente este comando e pressione Enter:
+
+   ```powershell
+   wsl --install
+   ```
+
+4. Aguarde o download terminar (pode levar alguns minutos). Quando pedir, **reinicie o computador**.
+5. Depois de reiniciar, o Ubuntu abre automaticamente numa janela preta (terminal). Se não abrir, procure **Ubuntu** no menu Iniciar e abra.
+6. Na primeira vez, ele vai pedir para você **criar um nome de usuário** e uma **senha** — pode ser qualquer nome, sem espaços ou acentos (ex.: `maria`, `joao123`). Digite e pressione Enter. Ao digitar a senha, as letras não aparecem na tela — isso é normal, é só continuar digitando e pressionar Enter. **Anote esse usuário e senha em algum lugar**, você vai precisar deles depois.
+
+### Parte 2 — Instalar o Museu Geomaker (um único comando)
+
+1. Abra o terminal **Ubuntu** (procure "Ubuntu" no menu Iniciar do Windows).
+2. Copie o comando abaixo por completo (o botão de copiar aparece ao passar o mouse sobre o bloco de código).
+3. Cole no terminal Ubuntu — no Windows Terminal, cole com `Ctrl+Shift+V` ou clique com o botão direito do mouse. Pressione Enter.
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/marceloclaro/site_geomaker_opencode/main/instalar.sh | bash
+   ```
+
+4. O terminal vai pedir sua senha do Ubuntu (a que você criou na Parte 1) — digite-a e pressione Enter. As letras não aparecem, é normal.
+5. Agora é só esperar. O instalador mostra `[passo X de Y]` conforme avança. **Não feche a janela** até aparecer a mensagem final `Tudo pronto!`.
+6. Se aparecer algum erro em vermelho, execute o mesmo comando de novo — o instalador é seguro para repetir e geralmente resolve na segunda tentativa (falhas de rede são as mais comuns).
+
+### Parte 3 — Acessar o museu
+
+1. Abra o navegador (Chrome, Edge ou Firefox) **no Windows** normalmente.
+2. Digite na barra de endereço: `http://localhost:8080`
+3. O site do museu deve aparecer. Clique em **Acervo** para testar o terminal do Geólogo Digital.
+
+### Passos extras opcionais (podem ser feitos depois, quando quiser)
+
+Essas duas etapas não são obrigatórias — o site funciona sem elas, mas alguns recursos ficam mais completos:
+
+**Ativar o terminal de IA (conversar com o Geólogo Digital):**
+
+No terminal Ubuntu, digite:
+
+```bash
+opencode auth login
+```
+
+Um link vai aparecer — copie e cole no navegador, faça login com sua conta (Google, GitHub, etc.) uma única vez.
+
+**Ativar dados de terreno reais no gerador 3D (Earth Engine do Google):**
+
+No terminal Ubuntu, digite:
+
+```bash
+bash ~/Geomaker_site/wsl/autenticar-earthengine.sh
+```
+
+Siga as instruções que aparecerem (abrir um link, fazer login com uma conta Google, colar um código).
+
+### Usar depois de reiniciar o computador
+
+O museu continua funcionando mesmo depois de reiniciar o Windows — o WSL mantém os serviços rodando em segundo plano. Se o site não abrir em `http://localhost:8080`, abra o terminal Ubuntu e digite:
+
+```bash
+bash ~/Geomaker_site/wsl/start.sh
+```
+
+Para verificar se tudo está funcionando corretamente:
+
+```bash
+bash ~/Geomaker_site/wsl/status.sh
+```
+
+### Se algo der errado
+
+- **"comando não encontrado" ou tela cheia de erro em vermelho**: copie a mensagem de erro e peça ajuda a alguém com mais experiência, ou execute o comando da Parte 2 novamente.
+- **o site não abre**: rode `bash ~/Geomaker_site/wsl/status.sh` e veja quais itens aparecem como `[FALHA]` ou `[ATENÇÃO]`.
+- **preciso recomeçar do zero**: pode rodar o comando da Parte 2 quantas vezes quiser, ele não duplica nada.
 
 ## Direção visual
 
@@ -27,15 +111,17 @@ npm test
 
 O projeto segue SDD e TDD. A especificação atual está em `docs/specs/001-site-local-wsl.md`, o processo em `docs/SDD_TDD.md` e `npm test` executa tanto os testes das páginas quanto os testes estruturais do pacote WSL. Para desenvolver, use Node.js 20 ou superior.
 
-## Instalação completa no WSL
+## Instalação completa no WSL (modo manual/avançado)
 
-No Ubuntu/WSL, extraia `Geomaker_site.zip` em uma pasta Linux e execute:
+A seção **Instalação para quem nunca usou o terminal**, no início deste documento, cobre o caminho recomendado com um único comando (`instalar.sh`). Esta seção é para quem já tem experiência com terminal e prefere clonar o repositório manualmente:
 
 ```bash
+git clone https://github.com/marceloclaro/site_geomaker_opencode.git ~/Geomaker_site
+cd ~/Geomaker_site
 bash wsl/setup.sh
 ```
 
-O instalador configura Nginx, Python, GDAL, Earth Engine, Gunicorn e o TouchTerrain. O museu fica em `http://localhost:8080` e o gerador topográfico em `http://localhost:8081`. Consulte `INICIAR_NO_WSL.md` para o roteiro completo, autenticação do Earth Engine, atualização do site e comandos de operação.
+O instalador configura Nginx, Node.js, o CLI OpenCode, Python, GDAL, Earth Engine, Gunicorn, o TouchTerrain e a ponte OpenCode (terminal do Geólogo Digital). O museu fica em `http://localhost:8080` (que já inclui o proxy para o TouchTerrain e para a ponte OpenCode) e o gerador topográfico standalone em `http://localhost:8081`. Consulte `INICIAR_NO_WSL.md` para o roteiro completo, autenticação do Earth Engine, atualização do site e comandos de operação.
 
 ## Estrutura
 

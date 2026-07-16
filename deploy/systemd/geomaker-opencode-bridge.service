@@ -1,15 +1,21 @@
+# Referência/documentação — o instalador (wsl/setup.sh) gera esta unidade
+# automaticamente com os valores corretos do seu usuário e caminhos. Não
+# é necessário editar ou instalar este arquivo manualmente.
 [Unit]
 Description=OpenCode Bridge — Geomaker (FastAPI)
 After=network.target
 
 [Service]
 Type=simple
-User=marceloclaro
+User=SEU_USUARIO_LINUX
 WorkingDirectory=/opt/geomaker/opencode-bridge
 Environment="PORT=8082"
 Environment="HOST=127.0.0.1"
+Environment="OPENCODE_BIN=/home/SEU_USUARIO_LINUX/.npm-global/bin/opencode"
 Environment="OPENCODE_MODEL=opencode/deepseek-v4-flash-free"
-ExecStart=/usr/bin/python3 -m uvicorn server:app --host 127.0.0.1 --port 8082
+Environment="OPENCODE_AGENT=marceloclaro"
+Environment="OPENCODE_WORK_DIR=/opt/geomaker/opencode-bridge"
+ExecStart=/opt/geomaker/opencode-bridge-venv/bin/python -m uvicorn server:app --host 127.0.0.1 --port 8082
 Restart=on-failure
 RestartSec=5
 
