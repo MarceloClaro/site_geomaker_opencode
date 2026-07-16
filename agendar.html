@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Solicite uma visita ou atividade do Museu Escolar Itinerante Geomaker.">
+  <meta name="theme-color" content="#173f3a"><title>Agendar visita — Geomaker</title>
+  <link rel="icon" href="assets/logo.png" type="image/png"><link rel="stylesheet" href="assets/styles.css">
+  <script defer src="assets/config.js"></script><script defer src="assets/data.js"></script><script defer src="assets/tainacan.js"></script><script defer src="assets/site.js"></script>
+</head>
+<body data-page="agendar">
+  <div data-site-header></div>
+  <main id="conteudo">
+    <header class="page-hero">
+      <div class="container"><nav class="breadcrumb" aria-label="Trilha de navegação"><a href="index.html">Início</a><span>Agendar visita</span></nav><div class="page-hero-grid"><div data-reveal><p class="eyebrow">O museu vai até você</p><h1>Vamos planejar uma <em>experiência.</em></h1><p class="lead">Conte-nos sobre sua escola, o público e o tema de interesse. A solicitação será avaliada antes da confirmação.</p></div><div class="page-number" aria-hidden="true">07</div></div></div>
+    </header>
+    <section class="section section-tight">
+      <div class="container form-layout">
+        <aside class="form-aside" data-reveal>
+          <p class="eyebrow">Como funciona</p><h2>Uma itinerância feita em conjunto.</h2><p>O formato depende das turmas, do espaço, do tempo disponível e dos objetivos pedagógicos.</p>
+          <div class="form-steps">
+            <div class="form-step"><span>1</span><div><strong>Solicitação</strong><small>A escola envia as informações iniciais.</small></div></div>
+            <div class="form-step"><span>2</span><div><strong>Alinhamento</strong><small>A equipe avalia tema, estrutura e disponibilidade.</small></div></div>
+            <div class="form-step"><span>3</span><div><strong>Confirmação</strong><small>Data e plano da atividade são formalizados.</small></div></div>
+          </div>
+        </aside>
+
+        <form class="visit-form" data-visit-form data-reveal>
+          <div class="field-grid">
+            <div class="field full"><label for="instituicao">Escola ou instituição *</label><input id="instituicao" name="instituicao" type="text" required autocomplete="organization"></div>
+            <div class="field"><label for="municipio">Município *</label><input id="municipio" name="municipio" type="text" required autocomplete="address-level2"></div>
+            <div class="field"><label for="responsavel">Responsável *</label><input id="responsavel" name="responsavel" type="text" required autocomplete="name"></div>
+            <div class="field"><label for="email">E-mail *</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+            <div class="field"><label for="telefone">Telefone *</label><input id="telefone" name="telefone" type="tel" required autocomplete="tel" placeholder="(88) 99999-9999"></div>
+            <div class="field"><label for="publico">Turmas ou público *</label><input id="publico" name="publico" type="text" required placeholder="Ex.: 6º ao 9º ano"></div>
+            <div class="field"><label for="participantes">Participantes estimados *</label><input id="participantes" name="participantes" type="number" min="1" max="1000" required></div>
+            <div class="field"><label for="periodo">Período desejado</label><input id="periodo" name="periodo" type="text" placeholder="Ex.: setembro de 2026"></div>
+            <div class="field"><label for="atividade">Tipo de atividade *</label><select id="atividade" name="atividade" required><option value="">Selecione</option><option>Exposição itinerante</option><option>Oficina educativa</option><option>Formação docente</option><option>Projeto integrado</option><option>Outro formato</option></select></div>
+            <div class="field full"><label for="tema">Tema de interesse *</label><input id="tema" name="tema" type="text" required placeholder="Ex.: cartografia, memória local, sensores ambientais…"></div>
+            <div class="field full"><label for="acessibilidade">Necessidades de acessibilidade</label><textarea id="acessibilidade" name="acessibilidade" placeholder="Informe condições que devam orientar o planejamento da atividade."></textarea></div>
+            <div class="field full"><label for="observacoes">Espaço disponível e observações</label><textarea id="observacoes" name="observacoes" placeholder="Descreva sala, pátio, energia, internet, transporte ou outras informações úteis."></textarea></div>
+          </div>
+          <p class="field-hint">* Campos obrigatórios. O envio da solicitação não confirma automaticamente a visita.</p>
+          <button class="button button-primary" type="submit">Preparar solicitação <span class="arrow">→</span></button>
+          <div class="form-status" data-form-status role="status"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <div data-site-footer></div><div data-site-search></div>
+</body>
+</html>

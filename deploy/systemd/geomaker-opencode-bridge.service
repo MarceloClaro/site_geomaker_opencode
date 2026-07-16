@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenCode Bridge — Geomaker (FastAPI)
+After=network.target
+
+[Service]
+Type=simple
+User=marceloclaro
+WorkingDirectory=/opt/geomaker/opencode-bridge
+Environment="PORT=8082"
+Environment="HOST=127.0.0.1"
+Environment="OPENCODE_MODEL=opencode/deepseek-v4-flash-free"
+ExecStart=/usr/bin/python3 -m uvicorn server:app --host 127.0.0.1 --port 8082
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore a Terra antiga e prepare modelos topográficos para impressão 3D no Laboratório Geomaker.">
+  <meta name="theme-color" content="#173f3a"><title>Laboratório digital — Geomaker</title>
+  <link rel="icon" href="assets/logo.png" type="image/png"><link rel="stylesheet" href="assets/styles.css">
+  <script defer src="assets/config.js"></script><script defer src="assets/data.js"></script><script defer src="assets/tainacan.js"></script><script defer src="assets/site.js"></script>
+</head>
+<body data-page="laboratorio">
+  <div data-site-header></div>
+  <main id="conteudo">
+    <header class="page-hero lab-page-hero">
+      <div class="container"><nav class="breadcrumb" aria-label="Trilha de navegação"><a href="index.html">Início</a><span>Laboratório digital</span></nav><div class="page-hero-grid"><div data-reveal><p class="eyebrow">Tempo geológico · cartografia · fabricação</p><h1>Da Terra antiga ao <em>relevo impresso.</em></h1><p class="lead">Viaje por 750 milhões de anos e transforme dados de elevação em modelos topográficos para impressão 3D.</p></div><div class="page-number" aria-hidden="true">07</div></div></div>
+    </header>
+
+    <section class="section ancient-earth-section" id="terra-antiga" aria-labelledby="terra-antiga-title">
+      <div class="container">
+        <div class="section-heading" data-reveal>
+          <div><p class="eyebrow">Paleogeografia interativa</p><h2 id="terra-antiga-title">Onde estava o seu território?</h2></div>
+          <p>Percorra 600 milhões de anos, gire o globo e acompanhe supercontinentes, mares e grandes marcos da história da vida.</p>
+        </div>
+
+        <div class="ancient-earth-layout">
+          <aside class="ancient-earth-guide" data-reveal>
+            <span class="lab-index">EXPERIMENTO · 01</span>
+            <h3>Ancient Earth</h3>
+            <ol>
+              <li><span>01</span><p>Escolha uma idade ou um marco, como Pangeia, primeiros dinossauros ou extinção do Cretáceo.</p></li>
+              <li><span>02</span><p>Arraste para girar o planeta e use a roda do mouse ou o gesto de pinça para controlar a aproximação.</p></li>
+              <li><span>03</span><p>Clique no globo e use as setas do teclado para avançar ou recuar no tempo.</p></li>
+            </ol>
+            <div class="external-note"><strong>Versão integrada em português</strong><p>O código, as texturas e os textos ficam hospedados no próprio site. Nenhum rastreador externo é carregado pela experiência.</p></div>
+            <div class="ancient-earth-actions"><a class="button button-primary" href="assets/ancient-earth/index.html#600" target="_blank" rel="noopener noreferrer">Abrir em tela cheia <span class="arrow" aria-hidden="true">↗</span></a><a class="button button-outline" href="https://github.com/MarceloClaro/ancient-earth" target="_blank" rel="noopener noreferrer">Ver código-fonte <span aria-hidden="true">↗</span></a></div>
+          </aside>
+
+          <div class="external-lab-frame ancient-earth-frame" data-reveal>
+            <div class="external-frame-bar"><span><i></i> Experiência local · interface em português</span><a href="assets/ancient-earth/index.html#600" target="_blank" rel="noopener noreferrer">Tela cheia ↗</a></div>
+            <iframe data-ancient-earth title="Terra Antiga — globo paleogeográfico interativo em português" src="assets/ancient-earth/index.html#600" loading="lazy" allow="fullscreen"></iframe>
+          </div>
+        </div>
+
+        <p class="lab-credit" data-reveal>Ancient Earth © 2015 Ian Webster. Versão em português baseada no fork público de Marcelo Claro. Texturas paleogeográficas de C. R. Scotese/Northern Arizona University. Licença original preservada no pacote do site.</p>
+      </div>
+    </section>
+
+    <section class="section terrain-lab-section" id="relevo-3d" aria-labelledby="relevo-3d-title">
+      <div class="container">
+        <div class="section-heading" data-reveal>
+          <div><p class="eyebrow">Fabricação digital</p><h2 id="relevo-3d-title">Prepare um relevo para imprimir em 3D.</h2></div>
+          <p>Defina uma área, ajuste escala e resolução, carregue os parâmetros no TouchTerrain e baixe o pacote com STL ou OBJ.</p>
+        </div>
+
+        <div class="terrain-workbench" data-reveal>
+          <form class="terrain-configurator" data-terrain-form>
+            <div class="terrain-form-title"><span class="lab-index">EXPERIMENTO · 02</span><h3>Preparador CAGEO</h3><p>Configuração compatível com o modo standalone do TouchTerrain 3.6.</p></div>
+
+            <fieldset>
+              <legend>1. Área geográfica</legend>
+              <div class="terrain-field-grid terrain-field-grid-four">
+                <label class="terrain-field"><span>Latitude sul</span><input name="bllat" type="number" min="-90" max="90" step="any" value="-5.2500" required></label>
+                <label class="terrain-field"><span>Longitude oeste</span><input name="bllon" type="number" min="-180" max="180" step="any" value="-40.7500" required></label>
+                <label class="terrain-field"><span>Latitude norte</span><input name="trlat" type="number" min="-90" max="90" step="any" value="-5.1000" required></label>
+                <label class="terrain-field"><span>Longitude leste</span><input name="trlon" type="number" min="-180" max="180" step="any" value="-40.5800" required></label>
+              </div>
+              <p class="terrain-field-note">Exemplo inicial: entorno de Crateús–CE. O canto sul/oeste deve ser menor que o canto norte/leste.</p>
+            </fieldset>
+
+            <fieldset>
+              <legend>2. Dados de elevação</legend>
+              <div class="terrain-field-grid">
+                <label class="terrain-field terrain-field-wide"><span>Modelo digital de elevação (DEM)</span><select name="DEM_name"><option value="JAXA/ALOS/AW3D30/V2_2">ALOS AW3D30 · global · 30 m</option><option value="USGS/SRTMGL1_003">SRTM GL1 · quase global · 30 m</option><option value="MERIT/DEM/v1_0_3">MERIT DEM · global · 90 m</option><option value="USGS/GMTED2010">GMTED2010 · global · 230 m</option><option value="NOAA/NGDC/ETOPO1">ETOPO1 · relevo e batimetria · 2 km</option></select></label>
+                <label class="terrain-field"><span>Nome do pacote</span><input name="zip_file_name" type="text" value="geomaker-crateus" pattern="[A-Za-z0-9_\-]+" maxlength="50" required></label>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>3. Modelo e impressão</legend>
+              <div class="terrain-field-grid terrain-field-grid-three">
+                <label class="terrain-field"><span>Largura por placa</span><div class="terrain-input-unit"><input name="tilewidth" type="number" min="20" max="500" step="1" value="120" required><small>mm</small></div></label>
+                <label class="terrain-field"><span>Resolução de impressão</span><div class="terrain-input-unit"><input name="printres" type="number" min="0.1" max="5" step="0.1" value="0.4" required><small>mm</small></div></label>
+                <label class="terrain-field"><span>Espessura da base</span><div class="terrain-input-unit"><input name="basethick" type="number" min="0.5" max="20" step="0.1" value="1.2" required><small>mm</small></div></label>
+                <label class="terrain-field"><span>Exagero vertical</span><div class="terrain-input-unit"><input name="zscale" type="number" min="0.1" max="20" step="0.1" value="2" required><small>×</small></div></label>
+                <label class="terrain-field"><span>Placas no eixo X</span><input name="ntilesx" type="number" min="1" max="10" step="1" value="1" required></label>
+                <label class="terrain-field"><span>Placas no eixo Y</span><input name="ntilesy" type="number" min="1" max="10" step="1" value="1" required></label>
+                <label class="terrain-field"><span>Formato</span><select name="fileformat"><option value="STLb">STL binário · recomendado</option><option value="STLa">STL ASCII</option><option value="obj">Wavefront OBJ</option></select></label>
+              </div>
+            </fieldset>
+
+            <div class="terrain-validation" data-terrain-validation aria-live="polite">Configuração válida para preparar.</div>
+            <div class="terrain-actions">
+              <a class="button button-outline" data-terrain-open href="/touchterrain/" target="_blank" rel="noopener noreferrer">Abrir TouchTerrain <span aria-hidden="true">↗</span></a>
+              <button class="button button-outline" type="button" data-terrain-download>Baixar configuração JSON</button>
+            </div>
+          </form>
+
+          <aside class="terrain-summary">
+            <div class="terrain-summary-top"><span class="lab-index">PRÉ-VISUALIZAÇÃO DOS PARÂMETROS</span><strong data-terrain-format>STL binário</strong></div>
+            <div class="terrain-metrics">
+              <div><span>Área real aproximada</span><strong data-terrain-extent>18,8 × 16,7 km</strong></div>
+              <div><span>Placas</span><strong data-terrain-tiles>1 × 1</strong></div>
+              <div><span>Largura física total</span><strong data-terrain-width>120 mm</strong></div>
+              <div><span>Exagero vertical</span><strong data-terrain-zscale>2×</strong></div>
+            </div>
+            <pre data-terrain-json aria-label="Configuração JSON gerada"></pre>
+            <div class="terrain-summary-note"><strong>O que será criado</strong><p>O TouchTerrain consulta o DEM, projeta a área e gera um ZIP com malha STL/OBJ, GeoTIFF e registro do processamento.</p></div>
+          </aside>
+        </div>
+
+        <div class="terrain-handoff" data-reveal>
+          <div><p class="eyebrow">Gerador de relevo</p><h3>TouchTerrain em página dedicada.</h3><p>Abra o TouchTerrain em tela cheia para definir a área, ajustar parâmetros e exportar o STL.</p></div>
+          <div class="terrain-handoff-actions"><a class="button button-primary" href="touchterrain.html">Abrir TouchTerrain <span aria-hidden="true">→</span></a><a class="button button-outline" href="/touchterrain/" target="_blank" rel="noopener noreferrer">Modo externo <span aria-hidden="true">↗</span></a><a class="button button-outline" href="https://github.com/MarceloClaro/TouchTerrain_for_CAGEO" target="_blank" rel="noopener noreferrer">Código CAGEO <span aria-hidden="true">↗</span></a></div>
+        </div>
+
+        <p class="lab-credit" data-reveal>TouchTerrain 3.6 é desenvolvido por Chris Harding e Franek Hasiuk. Código local baseado no fork público de Marcelo Claro. A aplicação roda no WSL; consultas de DEM online ainda dependem da autenticação e da disponibilidade do Google Earth Engine.</p>
+      </div>
+    </section>
+  </main>
+  <div data-site-footer></div><div data-site-search></div>
+</body>
+</html>

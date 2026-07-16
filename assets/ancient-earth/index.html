@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Globo paleogeográfico interativo em português, integrado ao Museu Escolar Itinerante Geomaker.">
+  <meta name="theme-color" content="#050807">
+  <title>Terra Antiga — Museu Geomaker</title>
+  <style>
+    :root { color-scheme: dark; --paper: #f3e6cd; --forest: #173f3a; --clay: #d5633c; --line: rgba(243,230,205,.22); }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { color: var(--paper); background: #000; font-family: "Segoe UI", Arial, sans-serif; }
+    button, select { font: inherit; }
+    button:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid #35a7b8; outline-offset: 3px; }
+    a { color: inherit; }
+    #webgl { position: fixed; z-index: 0; inset: 0; }
+    #webgl canvas { display: block; }
+    .topbar {
+      position: absolute; z-index: 5; top: 0; right: 0; left: 0; min-height: 66px;
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px;
+      padding: 10px 18px; border-bottom: 1px solid var(--line); background: rgba(3,8,7,.88); backdrop-filter: blur(12px);
+    }
+    .brand { color: var(--clay); font-size: .69rem; font-weight: 850; letter-spacing: .11em; text-decoration: none; text-transform: uppercase; }
+    .time-question { margin: 0; text-align: center; font-size: clamp(.9rem, 2.1vw, 1.25rem); }
+    .time-question label { font-weight: 760; }
+    #years-ago { min-height: 38px; margin: 0 6px; padding: 5px 30px 5px 10px; border: 1px solid var(--line); border-radius: 2px; color: white; background: var(--forest); font-weight: 800; }
+    .source-link { color: rgba(243,230,205,.66); font-size: .68rem; font-weight: 750; text-underline-offset: 4px; }
+    #controls { position: absolute; z-index: 4; top: 84px; right: 20px; width: min(265px, calc(100% - 40px)); display: grid; gap: 8px; text-align: right; }
+    #jump-to, .control-button, #search-input { width: 100%; min-height: 42px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 2px; color: var(--paper); background: rgba(11,25,22,.84); cursor: pointer; backdrop-filter: blur(8px); }
+    #jump-to, #search-input { text-align: left; }
+    #search-input { cursor: text; }
+    #search-input::placeholder { color: rgba(243,230,205,.42); }
+    #search-results { position: absolute; z-index: 6; top: 100%; left: 0; right: 0; margin: 2px 0 0; padding: 0; list-style: none; background: rgba(3,8,7,.94); backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 2px; max-height: 200px; overflow-y: auto; display: none; }
+    #search-results li { padding: 8px 11px; border-bottom: 1px solid var(--line); cursor: pointer; font-size: .82rem; }
+    #search-results li:hover, #search-results li.focused { background: var(--forest); }
+    #search-results li:last-child { border-bottom: none; }
+    .search-wrap { position: relative; }
+    .control-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .control-button { font-size: .74rem; font-weight: 800; }
+    .control-button:hover { background: rgba(36,89,79,.94); }
+    #story { position: absolute; z-index: 4; bottom: 24px; left: 24px; width: min(580px, calc(100% - 48px)); padding: 22px 24px; border-left: 5px solid var(--clay); background: rgba(3,8,7,.76); backdrop-filter: blur(10px); }
+    .earth-title { margin: 0 0 9px; color: white; font-size: clamp(1.25rem, 3vw, 2.25rem); font-weight: 850; letter-spacing: -.035em; }
+    #explanation { margin: 0; color: rgba(243,230,205,.78); font-size: clamp(.78rem, 1.45vw, .94rem); line-height: 1.55; }
+    #instructions { position: absolute; z-index: 4; right: 22px; bottom: 22px; color: rgba(243,230,205,.62); font-family: ui-monospace, Consolas, monospace; font-size: .67rem; }
+    #loading { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; color: white; background: #020403; font-size: 1rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .webgl-error { max-width: 620px; margin: 24vh auto; padding: 28px; color: white; text-align: center; line-height: 1.6; }
+    .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+    @media (max-width: 760px) {
+      .topbar { grid-template-columns: 1fr auto; min-height: 90px; padding: 9px 12px; }
+      .brand { display: none; }
+      .time-question { text-align: left; }
+      .source-link { grid-column: 2; grid-row: 1; }
+      #years-ago { display: block; width: 100%; margin: 5px 0 0; }
+      #controls { top: 105px; right: 12px; width: min(240px, calc(100% - 24px)); }
+      #story { right: 12px; bottom: 12px; left: 12px; width: auto; max-height: 42vh; overflow-y: auto; padding: 16px 17px; }
+      #instructions { display: none; }
+    }
+    @media (max-width: 480px) {
+      .source-link { font-size: 0; }
+      .source-link::after { content: "Código ↗"; font-size: .66rem; }
+      #controls { top: 101px; }
+      .control-row { grid-template-columns: 1fr; }
+      .earth-title { font-size: 1.2rem; }
+      #explanation { font-size: .76rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../../laboratorio.html" target="_parent">Museu Geomaker</a>
+    <p class="time-question"><label for="years-ago">Como era a Terra há</label><select id="years-ago"><option value="600">600 milhões de anos</option><option value="560">560 milhões de anos</option><option value="540">540 milhões de anos</option><option value="500">500 milhões de anos</option><option value="470">470 milhões de anos</option><option value="450">450 milhões de anos</option><option value="430">430 milhões de anos</option><option value="400">400 milhões de anos</option><option value="370">370 milhões de anos</option><option value="340">340 milhões de anos</option><option value="300">300 milhões de anos</option><option value="280">280 milhões de anos</option><option value="260">260 milhões de anos</option><option value="240">240 milhões de anos</option><option value="220">220 milhões de anos</option><option value="200">200 milhões de anos</option><option value="170">170 milhões de anos</option><option value="150">150 milhões de anos</option><option value="120">120 milhões de anos</option><option value="105">105 milhões de anos</option><option value="90">90 milhões de anos</option><option value="65">65 milhões de anos</option><option value="50">50 milhões de anos</option><option value="35">35 milhões de anos</option><option value="20">20 milhões de anos</option><option value="0">hoje</option></select></p>
+    <a class="source-link" href="https://github.com/MarceloClaro/ancient-earth" target="_blank" rel="noopener noreferrer">Código-fonte ↗</a>
+  </header>
+
+  <div id="controls" aria-label="Controles da experiência">
+    <div class="search-wrap">
+      <input id="search-input" type="text" placeholder="Buscar localização…" aria-label="Buscar localização no mapa">
+      <ul id="search-results" role="listbox" aria-label="Resultados da busca"></ul>
+    </div>
+    <label class="visually-hidden" for="jump-to">Ir para um marco da história da Terra</label>
+    <select id="jump-to"><option value="" selected disabled>Ir para um marco…</option><option value="600">Primeira vida multicelular</option><option value="540">Primeiras conchas</option><option value="470">Primeiros recifes de coral</option><option value="470">Primeiros vertebrados</option><option value="430">Primeiras plantas terrestres</option><option value="400">Primeiros animais terrestres</option><option value="400">Primeiros insetos</option><option value="300">Primeiros répteis</option><option value="220">Primeiros dinossauros</option><option value="120">Primeiras flores</option><option value="35">Primeiros primatas</option><option value="35">Primeiras gramíneas</option><option value="20">Primeiros hominínios</option><option value="600">Supercontinente Panótia</option><option value="280">Supercontinente Pangeia</option><option value="240">Triássico</option><option value="170">Jurássico</option><option value="105">Cretáceo</option><option value="65">Extinção do fim do Cretáceo</option></select>
+    <div class="control-row"><button id="remove-clouds" class="control-button" type="button" aria-pressed="false">Ocultar nuvens</button><button id="stop-rotation" class="control-button" type="button" aria-pressed="false">Pausar rotação</button></div>
+  </div>
+
+  <section id="story" aria-live="polite">
+    <h1 class="earth-title">Terra · <span id="how-long-ago">há 600 milhões de anos</span></h1>
+    <p id="explanation"></p>
+  </section>
+  <div id="instructions">Clique no globo e use ← → para percorrer o tempo.</div>
+  <div id="loading" role="status">Carregando o planeta…</div>
+  <div id="webgl" aria-label="Globo paleogeográfico tridimensional interativo"></div>
+  <noscript><p class="webgl-error">Ative o JavaScript para explorar o globo paleogeográfico.</p></noscript>
+
+  <script>var _w=console.warn;console.warn=function(m){if("string"!=typeof m||m.indexOf("THREE.ImageUtils.loadTexture")<0)_w.apply(console,arguments)};</script>
+  <script src="js/three.min.js"></script>
+  <script src="js/Detector.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script src="js/THREEx.WindowResize.js"></script>
+  <script src="js/explain.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

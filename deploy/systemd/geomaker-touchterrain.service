@@ -1,0 +1,25 @@
+[Unit]
+Description=Museu Geomaker - TouchTerrain local
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=marceloclaro
+Group=marceloclaro
+WorkingDirectory=/opt/geomaker/touchterrain
+Environment=HOME=/home/marceloclaro
+Environment=PYTHONPATH=/opt/geomaker/touchterrain
+Environment=TOUCHTERRAIN_TMP_FOLDER=/opt/geomaker/data/tmp
+Environment=TOUCHTERRAIN_DOWNLOADS_FOLDER=/opt/geomaker/data/downloads
+Environment=TOUCHTERRAIN_PREVIEWS_FOLDER=/opt/geomaker/data/previews
+Environment=TOUCHTERRAIN_GOOGLE_MAPS_KEY_FILE=/opt/geomaker/data/GoogleMapsKey.txt
+Environment=TOUCHTERRAIN_GA_ID=
+Environment=TOUCHTERRAIN_MAX_CELLS=4000000
+Environment=EE_PROJECT=gen-lang-client-0361234202
+ExecStart=/opt/geomaker/venv/bin/gunicorn --workers 2 --threads 4 --timeout 600 --bind 0.0.0.0:8081 touchterrain.server.TouchTerrain_app:app
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

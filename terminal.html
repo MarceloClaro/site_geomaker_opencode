@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenCode CLI · Terminal</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:#0a0e14;color:#b3b1ad;
+      font-family:"Cascadia Code","Fira Code","JetBrains Mono","Consolas",monospace;
+      font-size:14px;line-height:1.6;overflow:hidden}
+    ::selection{background:#3d4c5f;color:#e6e1cf}
+    ::-webkit-scrollbar{width:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#2a2f36;border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:#3d4c5f}
+    .app{display:flex;flex-direction:column;height:100vh}
+    .bar{display:flex;align-items:center;gap:8px;padding:8px 14px;
+      background:#0f1319;border-bottom:1px solid #1c2128;
+      flex-shrink:0;-webkit-user-select:none;user-select:none}
+    .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+    .title{font-size:12px;color:#5c6166;margin-left:6px;
+      font-family:system-ui,sans-serif;letter-spacing:.3px}
+    .title b{color:#8a8e93}
+    .actions{margin-left:auto;display:flex;gap:6px}
+    .actions button{background:none;border:1px solid #1c2128;
+      color:#6b7078;padding:3px 12px;border-radius:4px;cursor:pointer;
+      font-size:11px;font-family:inherit;transition:.12s}
+    .actions button:hover{background:#1c2128;color:#b3b1ad;border-color:#2a2f36}
+    .out{flex:1;overflow-y:auto;padding:16px 14px;scroll-behavior:smooth}
+    .l{white-space:pre-wrap;word-break:break-word;margin-bottom:2px;min-height:1.2em}
+    .l.b{animation:fadeIn .12s ease-out}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(1px)}to{opacity:1;transform:translateY(0)}}
+    .p0{color:#e6e1cf}
+    .p1{color:#f9a03f;font-weight:600}
+    .p2{color:#8a8e93}
+    .p3{color:#5c6166}
+    .p4{color:#7a9b76}
+    .p5{color:#df7777}
+    .p6{color:#6c99bb}
+    .prompt{color:#7a9b76;font-weight:600;margin-right:8px;user-select:none}
+    .input-wrap{display:flex;align-items:center;gap:6px;padding:7px 14px;
+      background:#0f1319;border-top:1px solid #1c2128;flex-shrink:0}
+    .input-wrap .prompt{flex-shrink:0}
+    .input{flex:1;background:transparent;border:none;color:#e6e1cf;
+      font-family:inherit;font-size:inherit;outline:none;caret-color:#7a9b76}
+    .input::placeholder{color:#363b44}
+    .input:disabled{opacity:.5}
+    .tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#5c6166}
+    .meta{border-top:1px solid #1c2128;padding-top:4px;margin-top:2px}
+    .meta .tag{color:#5c6166}
+    .logo{color:#f9a03f;margin-bottom:6px;line-height:1.3;font-size:13px}
+    .logo span{color:#5c6166}
+    .typing span:empty::after{content:"▊";animation:blink .8s step-end infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    @media(max-width:600px){.out{padding:12px 10px;font-size:13px}}
+  </style>
+</head>
+<body>
+<div class="app" data-term>
+  <div class="bar">
+    <span class="dot" style="background:#ff5f57"></span>
+    <span class="dot" style="background:#febc2e"></span>
+    <span class="dot" style="background:#28c840"></span>
+    <span class="title"><b>opencode</b> · deepseek-v4-flash-free · WSL</span>
+    <span class="actions">
+      <button data-clear>clear</button>
+      <button data-about>--help</button>
+    </span>
+  </div>
+  <div class="out" data-out>
+    <div class="l logo">
+  ╭──────────────────────────────────────────╮
+  │  ██████╗ ██████╗ ███████╗███╗   ██╗     │
+  │ ██╔═══██╗██╔══██╗██╔════╝████╗  ██║     │
+  │ ██║   ██║██████╔╝█████╗  ██╔██╗ ██║     │
+  │ ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║     │
+  │ ╚██████╔╝██║     ███████╗██║ ╚████║     │
+  │  ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝     │
+  │         Geólogo Digital v1.0              │
+  │         opencode/deepseek-v4-flash-free    │
+  ╰──────────────────────────────────────────╯
+    </div>
+    <div class="l p3">Digite sua pergunta sobre geologia, paleontologia ou museologia.</div>
+    <div class="l p3">Pressione <span class="p4">Ctrl+C</span> para interromper · <span class="p4">clear</span> para limpar.</div>
+    <div class="l" style="height:6px"></div>
+  </div>
+  <div class="input-wrap">
+    <span class="prompt">opencode@geomaker:~$</span>
+    <input class="input" data-in placeholder="oque é um fóssil?" autofocus spellcheck="true" autocomplete="off">
+  </div>
+</div>
+
+<script>
+(function(){
+  const out = document.querySelector('[data-out]');
+  const inp = document.querySelector('[data-in]');
+  document.querySelector('[data-clear]').addEventListener('click', () => {
+    if (abort) abort.abort();
+    running = false; inp.disabled = false;
+    out.innerHTML = '';
+    add('p3', 'Terminal limpo. Digite uma pergunta.');
+    const sp = document.createElement('div');
+    sp.className = 'l'; sp.style.height = '6px';
+    out.appendChild(sp);
+    inp.focus();
+  });
+  document.querySelector('[data-about]').addEventListener('click', () => {
+    add('p4', 'open-code/geologo-digital — OpenCode CLI Terminal');
+    add('p3', 'Modelo........ opencode/deepseek-v4-flash-free (gratuito)');
+    add('p3', 'Conexão....... WSL · FastAPI + SSE streaming');
+    add('p3', 'Bridge........ /api/terminal → localhost:8082');
+    add('p3', 'Interface..... terminal.html · Geomaker');
+  });
+
+  let running = false, abort = null;
+
+  const add = (cls, html) => {
+    const d = document.createElement('div');
+    d.className = 'l b ' + (cls||'');
+    d.innerHTML = html;
+    out.appendChild(d);
+    out.scrollTop = out.scrollHeight;
+    return d;
+  };
+
+  const streamSpan = () => {
+    let last = out.lastElementChild;
+    if (!last || !last.classList.contains('_s')) {
+      const d = document.createElement('div');
+      d.className = 'l b _s typing';
+      const s = document.createElement('span');
+      s.className = '';
+      d.appendChild(s);
+      out.appendChild(d);
+      last = d;
+    }
+    return last.querySelector('span');
+  };
+
+  inp.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const text = inp.value.trim();
+      if (!text || running) return;
+      inp.value = '';
+      running = true; inp.disabled = true;
+      add('', `<span class="prompt">opencode@geomaker:~$</span><span class="p0">${text.replace(/</g,'&lt;')}</span>`);
+      const url = '/api/terminal?prompt=' + encodeURIComponent(text);
+      abort = new AbortController();
+      try {
+        const r = await fetch(url, { signal: abort.signal, headers: { Accept: 'text/event-stream' } });
+        if (!r.ok) { add('p5', `erro: HTTP ${r.status}`); running = false; inp.disabled = false; return; }
+        const reader = r.body.getReader();
+        const dec = new TextDecoder();
+        let buf = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop() || '';
+          for (const line of lines) {
+            const t = line.trim();
+            if (!t || t.startsWith('event:')) continue;
+            if (t.startsWith('data: ')) {
+              try {
+                const d = JSON.parse(t.slice(6));
+                if (d.text !== undefined) {
+                  const span = streamSpan();
+                  span.textContent += d.text;
+                  const pos = out.scrollHeight - out.clientHeight - out.scrollTop;
+                  if (pos < 80) out.scrollTop = out.scrollHeight;
+                } else if (d.tokens_input !== undefined) {
+                  const last = out.lastElementChild;
+                  if (last && last.classList.contains('_s')) last.classList.remove('_s','typing');
+                  add('', `<div class="l b meta"><span class="tag">⚡ ${d.tokens_output} tok</span><span class="tag">⏱ ${d.elapsed}s</span><span class="tag">R$ ${(d.cost||0).toFixed(6)}</span></div>`);
+                } else if (d.message) { add('p5', 'erro: ' + d.message); }
+              } catch(_) {}
+            }
+          }
+        }
+        const last = out.lastElementChild;
+        if (last && last.classList.contains('_s')) last.classList.remove('_s','typing');
+      } catch(err) {
+        if (err.name === 'AbortError') add('p3', '^C  interrompido');
+        else add('p5', 'erro: ' + (err.message || 'conexão'));
+      }
+      running = false; inp.disabled = false; inp.focus();
+      const br = document.createElement('div'); br.className = 'l'; br.style.height = '4px';
+      out.appendChild(br);
+    }
+  });
+  inp.focus();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "geomaker-museum-site",
+  "version": "1.7.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:site && npm run test:wsl",
+    "test:site": "node tests/smoke.mjs",
+    "test:wsl": "node tests/wsl-package.mjs",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "happy-dom": "20.10.6"
+  }
+}

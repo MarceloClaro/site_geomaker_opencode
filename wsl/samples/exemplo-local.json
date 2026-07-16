@@ -1,0 +1,17 @@
+{
+  "importedDEM": "/opt/geomaker/installer/samples/SheepMtn.tif",
+  "printres": 1.0,
+  "ntilesx": 1,
+  "ntilesy": 1,
+  "tilewidth": 80,
+  "basethick": 1.2,
+  "zscale": 1.5,
+  "fileformat": "STLb",
+  "tile_centered": false,
+  "zip_file_name": "exemplo-geomaker-local",
+  "CPU_cores_to_use": null,
+  "max_cells_for_memory_only": 25000000,
+  "no_bottom": false,
+  "smooth_borders": true,
+  "no_normals": true
+}

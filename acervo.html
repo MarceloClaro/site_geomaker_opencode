@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore o acervo digital do Museu Escolar Itinerante Geomaker.">
+  <meta name="theme-color" content="#173f3a"><title>Acervo digital — Geomaker</title>
+  <link rel="icon" href="assets/logo.png" type="image/png"><link rel="stylesheet" href="assets/styles.css">
+  <style>
+    .oc-terminal{background:#0a0e14;border-radius:8px;overflow:hidden;font-family:"Cascadia Code","Fira Code","JetBrains Mono","Consolas",monospace;font-size:14px;line-height:1.6;color:#b3b1ad}
+    .oct-bar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0f1319;border-bottom:1px solid #1c2128;user-select:none}
+    .oct-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+    .oct-title{font-size:12px;color:#5c6166;margin-left:6px;font-family:system-ui,sans-serif}
+    .oct-title b{color:#8a8e93}
+    .oct-actions{margin-left:auto;display:flex;gap:6px}
+    .oct-btn{background:none;border:1px solid #1c2128;color:#6b7078;padding:3px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:inherit}
+    .oct-btn:hover{background:#1c2128;color:#b3b1ad}
+    .oct-out{height:360px;overflow-y:auto;padding:14px;scroll-behavior:smooth}
+    .oct-out::-webkit-scrollbar{width:6px}
+    .oct-out::-webkit-scrollbar-track{background:transparent}
+    .oct-out::-webkit-scrollbar-thumb{background:#2a2f36;border-radius:3px}
+    .oct-l{white-space:pre-wrap;word-break:break-word;margin-bottom:2px;min-height:1.2em}
+    .oct-l.b{animation:fadeIn .12s ease-out}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(1px)}to{opacity:1;transform:translateY(0)}}
+    .oct-p0{color:#e6e1cf}.oct-p1{color:#f9a03f}.oct-p2{color:#8a8e93}.oct-p3{color:#5c6166}.oct-p4{color:#7a9b76}.oct-p5{color:#df7777}.oct-p6{color:#6c99bb}
+    .oct-prompt{color:#7a9b76;font-weight:600;margin-right:8px;user-select:none;flex-shrink:0}
+    .oct-input-wrap{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#0f1319;border-top:1px solid #1c2128}
+    .oct-input{flex:1;background:transparent;border:none;color:#e6e1cf;font-family:inherit;font-size:inherit;outline:none;caret-color:#7a9b76}
+    .oct-input::placeholder{color:#363b44}
+    .oct-input:disabled{opacity:.5}
+    .oct-logo{color:#f9a03f;margin-bottom:6px;line-height:1.3;font-size:13px}
+    .oct-logo span{color:#5c6166}
+    .typing span:empty::after{content:"▊";animation:blink .8s step-end infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .oct-meta{border-top:1px solid #1c2128;padding-top:4px;margin-top:2px;font-size:12px;color:#5c6166;display:flex;gap:12px}
+    .oct-spinner{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font-size:11px;color:#7a9b76;opacity:0;transition:opacity .25s}
+    .oct-spinner.show{opacity:1}
+    .oct-spinner-dot{width:5px;height:5px;border-radius:50%;background:#7a9b76;animation:octPulse 1.2s ease-in-out infinite}
+    .oct-spinner-dot:nth-child(2){animation-delay:.2s}
+    .oct-spinner-dot:nth-child(3){animation-delay:.4s}
+    @keyframes octPulse{0%,80%,100%{opacity:.2;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+    .oct-input.processing+label.oct-proc-label{opacity:1}/* placeholder for future use */
+    .proj-panel{width:280px;flex-shrink:0;background:#0f1319;border-radius:8px;display:flex;flex-direction:column;overflow:hidden;font-family:system-ui,sans-serif;font-size:12px}
+    .proj-header{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #1c2128}
+    .proj-header-actions{margin-left:auto;display:flex;gap:4px}
+    .proj-title{font-weight:600;color:#8a8e93;font-size:12px}
+    .proj-list{flex:1;overflow-y:auto;padding:6px;min-height:80px}
+    .proj-list::-webkit-scrollbar{width:4px}
+    .proj-list::-webkit-scrollbar-thumb{background:#2a2f36;border-radius:2px}
+    .proj-empty{color:#484f58;padding:20px 10px;text-align:center;line-height:1.6;font-size:11px}
+    .proj-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:4px;cursor:pointer;transition:.1s;margin-bottom:2px}
+    .proj-item:hover{background:#1c2128}
+    .proj-item.active{background:#1c2128;border-left:2px solid #7a9b76}
+    .proj-item-icon{font-size:14px;flex-shrink:0}
+    .proj-item-info{flex:1;min-width:0}
+    .proj-item-title{color:#b3b1ad;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .proj-item-meta{color:#5c6166;font-size:10px}
+    .proj-item-badge{font-size:10px;color:#7a9b76;background:#1a2420;padding:1px 6px;border-radius:3px}
+    .proj-active{border-top:1px solid #1c2128}
+    .proj-badge{font-size:10px;color:#6c99bb;font-family:monospace;margin-left:auto}
+    .proj-files{padding:6px 10px;min-height:50px;max-height:150px;overflow-y:auto}
+    .proj-files::-webkit-scrollbar{width:4px}
+    .proj-files::-webkit-scrollbar-thumb{background:#2a2f36;border-radius:2px}
+    .proj-file-placeholder{color:#484f58;font-size:11px;text-align:center;padding:10px}
+    .proj-file{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:11px;color:#8a8e93}
+    .proj-file a{color:#6c99bb;text-decoration:none}
+    .proj-file a:hover{color:#7a9b76;text-decoration:underline}
+    .proj-file .ext{font-size:9px;background:#1c2128;padding:1px 4px;border-radius:2px;color:#5c6166;text-transform:uppercase}
+    .proj-file .size{color:#484f58;margin-left:auto;font-size:10px}
+    .proj-actions{display:flex;gap:4px;padding:6px 10px;border-top:1px solid #1c2128}
+    .proj-actions .oct-btn{flex:1;text-align:center}
+    .proj-dissertacao{padding:8px 10px;border-top:1px solid #1c2128}
+    .diss-btn{width:100%;text-align:center;padding:7px 8px;font-size:11px;color:#e0a030;border-color:#3a2f1c}
+    .diss-btn:hover{background:#2a2010}
+    .diss-btn:disabled{opacity:.5;cursor:not-allowed}
+    .diss-status{margin-top:6px;font-size:11px;line-height:1.6;color:#8a8e93}
+    .diss-status.processando{color:#e0a030}
+    .diss-status.concluido{color:#7a9b76}
+    .diss-status.erro{color:#df7777}
+    .diss-status a{color:#6c99bb;text-decoration:none}
+    .diss-status a:hover{text-decoration:underline}
+    .diss-dots::after{content:"";animation:dissDots 1.4s steps(4,end) infinite}
+    @keyframes dissDots{0%,20%{content:""}40%{content:"."}60%{content:".."}80%,100%{content:"..."}}
+    [data-view-toggle]{display:none}
+    .ai-geologist-shell.show-project .oc-terminal{display:none}
+    .ai-geologist-shell.show-project .proj-panel{width:100%}
+    .ai-geologist-shell.show-project [data-view-toggle]{display:inline-block}
+  </style>
+  <script defer src="assets/config.js"></script><script defer src="assets/data.js"></script><script defer src="assets/tainacan.js"></script><script defer src="assets/site.js"></script>
+</head>
+<body data-page="acervo">
+  <div data-site-header></div>
+  <main id="conteudo">
+    <header class="page-hero">
+      <div class="container"><nav class="breadcrumb" aria-label="Trilha de navegação"><a href="index.html">Início</a><span>Acervo</span></nav><div class="page-hero-grid"><div data-reveal><p class="eyebrow">Coleções digitais</p><h1>Objetos que contam <em>territórios.</em></h1><p class="lead">Explore registros de cartografia, ciência, tecnologia, ambiente e memória escolar.</p></div><div class="page-number" aria-hidden="true">02</div></div></div>
+    </header>
+
+    <section class="section photo-collection" aria-labelledby="acervo-imagens-title">
+      <div class="container">
+        <div class="section-heading" data-reveal>
+          <div><p class="eyebrow">Acervo em imagens</p><h2 id="acervo-imagens-title">Veja de perto. Compare os ângulos.</h2></div>
+          <p>Fotografias reais do acervo Geomaker aproximam fósseis e minerais da sala de aula. As identificações catalográficas ainda serão confirmadas pela equipe.</p>
+        </div>
+
+        <article class="angle-viewer" data-angle-viewer data-reveal>
+          <div class="angle-stage">
+            <img src="assets/acervo/peca-fossilifera-vista-a.jpg" alt="Peça fossilífera do acervo vista pelo primeiro ângulo" data-angle-image>
+            <span class="angle-stage-index" data-angle-index aria-hidden="true">01</span>
+          </div>
+          <div class="angle-copy">
+            <p class="eyebrow">Registro multiângulo · base para 3D</p>
+            <h3>Uma peça, mais de um ponto de vista.</h3>
+            <p>Alterne as fotografias para perceber contorno, volume e textura. O par é o primeiro passo para uma futura captura por fotogrametria.</p>
+            <div class="angle-controls" role="group" aria-label="Escolher ângulo da peça">
+              <button class="active" type="button" aria-pressed="true" data-angle-src="assets/acervo/peca-fossilifera-vista-a.jpg" data-angle-alt="Peça fossilífera do acervo vista pelo primeiro ângulo" data-angle-number="01"><span>01</span> Vista A</button>
+              <button type="button" aria-pressed="false" data-angle-src="assets/acervo/peca-fossilifera-vista-b.jpg" data-angle-alt="Peça fossilífera do acervo vista pelo segundo ângulo" data-angle-number="02"><span>02</span> Vista B</button>
+            </div>
+            <p class="angle-note">Para gerar um modelo 3D navegável, será necessária uma sequência completa de fotografias ao redor da peça.</p>
+          </div>
+        </article>
+
+        <div class="museum-photo-grid" aria-label="Galeria fotográfica do acervo">
+          <button class="museum-photo museum-photo-contain" type="button" data-reveal data-image-open data-image-src="assets/acervo/amonite-vista-a.jpg" data-image-alt="Amonite do acervo em vista geral" data-image-caption="Amonite — vista geral A">
+            <img src="assets/acervo/amonite-vista-a.jpg" alt="Amonite do acervo em vista geral" loading="lazy" decoding="async"><span>01</span><strong>Amonite · vista geral</strong>
+          </button>
+          <button class="museum-photo" type="button" data-reveal data-image-open data-image-src="assets/acervo/amonite-detalhe.jpg" data-image-alt="Detalhe aproximado da espiral de uma amonite" data-image-caption="Amonite — detalhe da espiral e das ranhuras">
+            <img src="assets/acervo/amonite-detalhe.jpg" alt="Detalhe aproximado da espiral de uma amonite" loading="lazy" decoding="async"><span>02</span><strong>Geometria em detalhe</strong>
+          </button>
+          <button class="museum-photo museum-photo-contain" type="button" data-reveal data-image-open data-image-src="assets/acervo/amonite-vista-b.jpg" data-image-alt="Amonite do acervo em uma segunda vista" data-image-caption="Amonite — vista geral B">
+            <img src="assets/acervo/amonite-vista-b.jpg" alt="Amonite do acervo em uma segunda vista" loading="lazy" decoding="async"><span>03</span><strong>Amonite · vista B</strong>
+          </button>
+          <button class="museum-photo museum-photo-contain" type="button" data-reveal data-image-open data-image-src="assets/acervo/mineral-verde-azulado.jpg" data-image-alt="Amostra mineral com estrutura verde e azulada" data-image-caption="Amostra mineral — cor, faixas e estrutura">
+            <img src="assets/acervo/mineral-verde-azulado.jpg" alt="Amostra mineral com estrutura verde e azulada" loading="lazy" decoding="async"><span>04</span><strong>Cor e estrutura mineral</strong>
+          </button>
+          <button class="museum-photo" type="button" data-reveal data-image-open data-image-src="assets/acervo/peca-fossilifera-detalhe.jpg" data-image-alt="Detalhe de superfície de uma peça fossilífera" data-image-caption="Peça fossilífera — detalhe de superfície">
+            <img src="assets/acervo/peca-fossilifera-detalhe.jpg" alt="Detalhe de superfície de uma peça fossilífera" loading="lazy" decoding="async"><span>05</span><strong>Textura fossilífera</strong>
+          </button>
+          <button class="museum-photo museum-photo-contain" type="button" data-reveal data-image-open data-image-src="assets/acervo/mineral-translucido-amarelo.jpg" data-image-alt="Amostra mineral translúcida de cor amarela" data-image-caption="Amostra mineral translúcida — registro fotográfico">
+            <img src="assets/acervo/mineral-translucido-amarelo.jpg" alt="Amostra mineral translúcida de cor amarela" loading="lazy" decoding="async"><span>06</span><strong>Mineral translúcido</strong>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark digital-lab" id="acervo-3d" aria-labelledby="acervo-3d-title">
+      <div class="container">
+        <div class="section-heading" data-reveal>
+          <div><p class="eyebrow">Laboratório digital</p><h2 id="acervo-3d-title">Gire, aproxime e investigue em 3D.</h2></div>
+          <p>Os visualizadores abaixo são carregados pelo Sketchfab e precisam de conexão com a internet. Use o mouse, o toque ou os controles do quadro para explorar.</p>
+        </div>
+
+        <div class="model-grid">
+          <article class="model-card" data-reveal data-3d-viewer>
+            <div class="model-frame">
+              <iframe title="Fóssil 0001 — modelo tridimensional interativo" src="https://sketchfab.com/models/0a78eb40fde84caa855b5acf6fb197bb/embed?autostart=0&amp;ui_theme=dark" loading="lazy" allow="autoplay; fullscreen; xr-spatial-tracking" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+            <div class="model-copy">
+              <div><span class="model-index">3D · 01</span><h3>Fóssil interativo</h3><p>Observe a peça por diferentes ângulos e aproxime detalhes morfológicos diretamente no navegador.</p></div>
+              <a href="https://sketchfab.com/models/0a78eb40fde84caa855b5acf6fb197bb" target="_blank" rel="noopener">Abrir no Sketchfab <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+
+          <article class="model-card" data-reveal data-3d-viewer>
+            <div class="model-frame">
+              <iframe title="Minerais de A a Z — coleção tridimensional interativa" src="https://sketchfab.com/playlists/embed?collection=94db44670e8040eda6f6e394c51848cc&amp;autostart=0&amp;ui_theme=dark" loading="lazy" allow="autoplay; fullscreen; xr-spatial-tracking" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+            <div class="model-copy">
+              <div><span class="model-index">3D · 02</span><h3>Minerais de A–Z</h3><p>Navegue por uma coleção de minerais em três dimensões e compare formas, superfícies e estruturas.</p></div>
+              <a href="https://sketchfab.com/playlists/94db44670e8040eda6f6e394c51848cc" target="_blank" rel="noopener">Abrir coleção <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+        </div>
+
+        <p class="model-credit" data-reveal>Conteúdo 3D hospedado externamente. Autoria, licença e identificação de cada modelo devem ser conferidas no registro correspondente do Sketchfab.</p>
+      </div>
+    </section>
+
+    <section class="section ai-geologist-section" id="geologo-digital" aria-labelledby="geologo-digital-title">
+      <div class="container">
+        <div class="section-heading" data-reveal>
+          <div><p class="eyebrow">Mediação com inteligência artificial</p><h2 id="geologo-digital-title">Geólogo Digital</h2></div>
+          <p>Pergunte ao Geólogo Digital. O modelo open-source roda no servidor WSL do museu via OpenCode CLI, sem chave de API.</p>
+        </div>
+
+        <div class="ai-geologist-shell" data-shell data-reveal style="display:flex; gap:1rem; align-items:stretch;">
+          <div class="oc-terminal" data-term style="flex:1; min-width:0;">
+            <div class="oct-bar">
+              <span class="oct-dot" style="background:#ff5f57"></span>
+              <span class="oct-dot" style="background:#febc2e"></span>
+              <span class="oct-dot" style="background:#28c840"></span>
+              <span class="oct-title"><b>opencode</b> · deepseek-v4-flash-free · WSL</span>
+              <span class="oct-spinner" data-spinner>
+                <span class="oct-spinner-dot"></span>
+                <span class="oct-spinner-dot"></span>
+                <span class="oct-spinner-dot"></span>
+                processando…
+              </span>
+              <span class="oct-actions">
+                <button class="oct-btn" data-clear>clear</button>
+                <button class="oct-btn" data-about>--help</button>
+              </span>
+            </div>
+            <div class="oct-out" data-out>
+              <div class="oct-l oct-logo">
+  ╭──────────────────────────────────────────╮
+  │  ██████╗ ██████╗ ███████╗███╗   ██╗     │
+  │ ██╔═══██╗██╔══██╗██╔════╝████╗  ██║     │
+  │ ██║   ██║██████╔╝█████╗  ██╔██╗ ██║     │
+  │ ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║     │
+  │ ╚██████╔╝██║     ███████╗██║ ╚████║     │
+  │  ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝     │
+  │         Geólogo Digital v1.0              │
+  │         opencode/deepseek-v4-flash-free    │
+  ╰──────────────────────────────────────────╯
+              </div>
+              <div class="oct-l oct-p3">Digite sua pergunta sobre geologia, paleontologia ou museologia.</div>
+              <div class="oct-l oct-p3">Pressione <span class="oct-p4">Ctrl+C</span> para interromper · <span class="oct-p4">clear</span> para limpar.</div>
+              <div class="oct-l" style="height:6px"></div>
+            </div>
+            <div class="oct-input-wrap">
+              <span class="oct-prompt">opencode@geomaker:~$</span>
+              <input class="oct-input" data-in placeholder="oque é um fóssil?" autofocus spellcheck="true" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="proj-panel" data-panel>
+            <div class="proj-header">
+              <span class="proj-title">📁 Projetos</span>
+              <div class="proj-header-actions">
+                <button class="oct-btn" data-view-toggle title="Mostrar terminal">🖥 Terminal</button>
+                <button class="oct-btn" data-proj-delete title="Limpar projeto ativo" style="color:#df7777">✕</button>
+                <button class="oct-btn" data-proj-refresh title="Atualizar lista">↻</button>
+                <a class="oct-btn" href="/api/erro.txt" target="_blank" title="Baixar relatório de erros" style="text-decoration:none">⚠</a>
+              </div>
+            </div>
+            <div class="proj-list" data-proj-list>
+              <div class="proj-empty">Nenhum projeto ainda.<br>Cada consulta gera um novo.</div>
+            </div>
+            <div class="proj-active" data-proj-active hidden>
+              <div class="proj-header" style="border:none;padding:8px 10px;">
+                <span class="proj-title" style="font-size:11px;">📄 Projeto atual</span>
+                <span class="proj-badge" data-proj-id></span>
+              </div>
+              <div class="proj-files" data-proj-files>
+                <div class="proj-file-placeholder">Aguardando consulta...</div>
+              </div>
+              <div class="proj-actions">
+                <button class="oct-btn" data-proj-pdf disabled title="Compilar PDF">▸ PDF</button>
+                <button class="oct-btn" data-proj-zip disabled title="Baixar ZIP">⬇ ZIP</button>
+                <a class="oct-btn" data-proj-dl-md disabled title="Download MD" style="text-decoration:none">📝</a>
+              </div>
+              <div class="proj-dissertacao">
+                <button class="oct-btn diss-btn" data-diss-gerar title="Gera dissertação completa via orquestrador /marceloclaro (pode levar 1-3 min)">📜 Gerar Dissertação Completa (/marceloclaro)</button>
+                <div class="diss-status" data-diss-status hidden></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-tight" id="tainacan">
+      <div class="container">
+        <div class="tainacan-access" data-reveal>
+          <div>
+            <p class="eyebrow">Gestão do acervo</p>
+            <h2>Cadastre no Tainacan. Publique automaticamente aqui.</h2>
+            <p>O cadastro é feito por uma pessoa autorizada no painel protegido do WordPress. O site público consulta somente os itens publicados pela API.</p>
+          </div>
+          <div class="tainacan-access-actions">
+            <a class="button button-primary" href="#configurar-tainacan" data-tainacan-admin>Cadastrar item no Tainacan <span class="arrow">↗</span></a>
+            <a class="button button-outline" href="admin-acervo.html">Cadastro local <span class="arrow">→</span></a>
+            <button class="button button-outline" type="button" data-tainacan-help>Como configurar</button>
+            <p class="tainacan-config-status" data-tainacan-config-status>Acesso ainda não configurado.</p>
+          </div>
+        </div>
+
+        <details class="tainacan-setup" id="configurar-tainacan" data-tainacan-setup>
+          <summary>Como instalar, criar a coleção e conectar ao site</summary>
+          <div class="tainacan-setup-grid">
+            <ol class="tainacan-steps">
+              <li><span>01</span><div><strong>Prepare um WordPress</strong><p>Use um domínio ou subdomínio institucional, por exemplo <code>acervo.seudominio.org</code>.</p></div></li>
+              <li><span>02</span><div><strong>Instale o plugin Tainacan</strong><p>No WordPress, abra <em>Plugins → Adicionar novo</em>, procure “Tainacan”, instale e ative.</p></div></li>
+              <li><span>03</span><div><strong>Crie a coleção</strong><p>No menu Tainacan, escolha <em>Nova coleção</em>, defina os metadados e adicione as peças com suas imagens.</p></div></li>
+              <li><span>04</span><div><strong>Copie o ID da coleção</strong><p>Abra a coleção no painel. O número exibido na URL ou retornado pela API é o ID usado pelo site.</p></div></li>
+              <li><span>05</span><div><strong>Preencha a configuração</strong><p>Edite <code>assets/config.js</code> com a URL pública, o ID e o endereço administrativo.</p></div></li>
+            </ol>
+            <div class="tainacan-code-card">
+              <p class="eyebrow">assets/config.js</p>
+              <pre><code>tainacanBaseUrl: "https://acervo.seudominio.org",
+tainacanCollectionId: "12",
+tainacanAdminUrl: "https://acervo.seudominio.org/wp-admin/",</code></pre>
+              <p>Depois de salvar e publicar novamente o site, o botão acima abrirá o painel e o catálogo passará a buscar os registros públicos.</p>
+              <a href="https://br.wordpress.org/plugins/tainacan/" target="_blank" rel="noopener">Documentação oficial do plugin <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </details>
+
+        <div class="integration-note" data-reveal>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>
+          <div><strong>Catálogo preparado para o Tainacan</strong><p>Enquanto a URL e o ID estiverem vazios, esta área usa itens demonstrativos. Depois da configuração, os registros públicos serão carregados pela API REST.</p></div>
+        </div>
+
+        <div class="toolbar" role="group" aria-label="Filtros do acervo">
+          <div class="search-field"> <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.7-3.7"/></svg><label class="visually-hidden" for="collection-search">Buscar no acervo</label><input id="collection-search" data-collection-search type="search" placeholder="Buscar objeto, origem ou descrição…"></div>
+          <label class="visually-hidden" for="collection-filter">Filtrar por coleção</label><select id="collection-filter" data-collection-filter><option value="">Todas as coleções</option></select>
+          <div class="collection-status" data-collection-status><span class="status-dot"></span>Carregando catálogo…</div>
+        </div>
+
+        <div class="collection-grid" data-collection-grid aria-live="polite"><div class="empty-state"><p>Carregando itens do acervo…</p></div></div>
+      </div>
+    </section>
+
+    <section class="section section-sand">
+      <div class="container story-grid">
+        <div data-reveal><p class="eyebrow">Documentação</p><h2>Metadados com propósito educativo.</h2></div>
+        <div data-reveal><p class="lead">Cada registro poderá combinar identificação museológica, contexto territorial, direitos de uso e uma camada de mediação para professores e estudantes.</p><p>O modelo é compatível com taxonomias, filtros e mapeamento para padrões como Dublin Core. Imagens e textos deverão ser publicados apenas com origem e licença verificadas.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" data-object-modal role="dialog" aria-modal="true" aria-label="Ficha museológica">
+    <div class="modal-card"><button class="icon-button modal-close" type="button" data-modal-close aria-label="Fechar ficha">×</button><div data-modal-body></div></div>
+  </div>
+  <dialog class="image-lightbox" data-image-lightbox aria-label="Imagem ampliada do acervo">
+    <div class="image-lightbox-card">
+      <button class="icon-button image-lightbox-close" type="button" data-image-close aria-label="Fechar imagem ampliada">×</button>
+      <figure><img src="" alt="" data-lightbox-image><figcaption data-lightbox-caption></figcaption></figure>
+    </div>
+  </dialog>
+  <div data-site-footer></div><div data-site-search></div>
+<script>
+(function(){
+  var out = document.querySelector('[data-out]');
+  var inp = document.querySelector('[data-in]');
+  if (!out || !inp) return;
+  var running = false, abort = null, projeto = null, lastResposta = '', lastTokens = {}, ultimoPrompt = '';
+  var spinner = document.querySelector('[data-spinner]');
+  function setRunning(v) {
+    running = v;
+    inp.disabled = v;
+    if (spinner) spinner.classList.toggle('show', v);
+  }
+
+  // ── Projetos ─────────────────────────────────────────
+  var shell = document.querySelector('[data-shell]');
+  var viewToggle = document.querySelector('[data-view-toggle]');
+  var panel = document.querySelector('[data-panel]');
+  var projList = document.querySelector('[data-proj-list]');
+  var projActive = document.querySelector('[data-proj-active]');
+  var projFiles = document.querySelector('[data-proj-files]');
+  var projId = document.querySelector('[data-proj-id]');
+  var btnPdf = document.querySelector('[data-proj-pdf]');
+  var btnZip = document.querySelector('[data-proj-zip]');
+  var btnDelete = document.querySelector('[data-proj-delete]');
+  var btnDiss = document.querySelector('[data-diss-gerar]');
+  var dissStatus = document.querySelector('[data-diss-status]');
+  var dissPollTimer = null;
+
+  function pararPollingDissertacao() {
+    if (dissPollTimer) { clearInterval(dissPollTimer); dissPollTimer = null; }
+  }
+
+  function renderDissStatus(pid, d) {
+    dissStatus.hidden = false;
+    dissStatus.className = 'diss-status ' + (d.status || '');
+    if (d.status === 'processando') {
+      btnDiss.disabled = true;
+      dissStatus.innerHTML = '⏳ Gerando dissertação completa via /marceloclaro<span class="diss-dots"></span><br><small>Isso normalmente leva de 1 a 3 minutos.</small>';
+    } else if (d.status === 'concluido') {
+      btnDiss.disabled = false;
+      btnDiss.textContent = '📜 Gerar Nova Dissertação (/marceloclaro)';
+      var linkPdf = d.pdf ? '<a href="/api/project/' + pid + '/file/' + d.pdf + '" target="_blank">📕 ' + d.pdf + '</a>' : '(PDF não compilou)';
+      dissStatus.innerHTML = '✓ Dissertação concluída em ' + (d.elapsed || '?') + 's — ' + linkPdf;
+      atualizarProjetoAtivo();
+      pararPollingDissertacao();
+    } else if (d.status === 'erro') {
+      btnDiss.disabled = false;
+      dissStatus.innerHTML = '✗ erro: ' + (d.mensagem || 'falha desconhecida');
+      pararPollingDissertacao();
+    } else {
+      dissStatus.hidden = true;
+    }
+  }
+
+  function iniciarPollingDissertacao(pid) {
+    pararPollingDissertacao();
+    dissPollTimer = setInterval(function() {
+      fetch('/api/project/' + pid + '/dissertacao/status')
+        .then(function(r){ return r.json(); })
+        .then(function(d){ renderDissStatus(pid, d); })
+        .catch(function(){});
+    }, 4000);
+  }
+
+  if (btnDiss) {
+    btnDiss.addEventListener('click', function() {
+      if (!projeto) { showTerminalView(); add('oct-p3', 'Faça uma pergunta primeiro para criar um projeto.'); return; }
+      var prompt = ultimoPrompt || (projId.textContent ? '' : '');
+      if (!prompt) { alert('Faça uma pergunta no terminal antes de gerar a dissertação completa.'); return; }
+      btnDiss.disabled = true;
+      fetch('/api/project/' + projeto + '/dissertacao', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ prompt: prompt })
+      }).then(function(r){ return r.json(); }).then(function(d){
+        renderDissStatus(projeto, { status: 'processando' });
+        iniciarPollingDissertacao(projeto);
+      }).catch(function(){
+        dissStatus.hidden = false;
+        dissStatus.className = 'diss-status erro';
+        dissStatus.textContent = '✗ erro ao iniciar geração';
+        btnDiss.disabled = false;
+      });
+    });
+  }
+
+
+  function showProjectView() {
+    if (shell) shell.classList.add('show-project');
+    if (viewToggle) viewToggle.textContent = '🖥 Terminal';
+  }
+  function showTerminalView() {
+    if (shell) shell.classList.remove('show-project');
+    if (viewToggle) viewToggle.textContent = '📁 Projeto';
+  }
+  if (viewToggle) {
+    viewToggle.addEventListener('click', function() {
+      if (shell && shell.classList.contains('show-project')) showTerminalView();
+      else showProjectView();
+    });
+  }
+
+  function carregarProjetos() {
+    fetch('/api/projects').then(function(r){return r.json()}).then(function(d){
+      var html = '';
+      if (!d.projetos || d.projetos.length === 0) {
+        html = '<div class="proj-empty">Nenhum projeto ainda.<br>Cada consulta gera um novo.</div>';
+      } else {
+        for (var i = 0; i < d.projetos.length; i++) {
+          var p = d.projetos[i];
+          var ativo = projeto && p.id === projeto ? ' active' : '';
+          html += '<div class="proj-item' + ativo + '" data-pid="' + p.id + '">';
+          html += '<span class="proj-item-icon">📄</span>';
+          html += '<div class="proj-item-info"><div class="proj-item-title">' + (p.titulo || p.id) + '</div>';
+          html += '<div class="proj-item-meta">' + (p.mensagens||0) + ' msg · ' + (p.arquivos.pdf||0) + ' PDF</div></div>';
+          html += '<span class="proj-item-badge">' + p.id.slice(0,12) + '</span></div>';
+        }
+      }
+      projList.innerHTML = html;
+      // clique no item
+      projList.querySelectorAll('.proj-item').forEach(function(el){
+        el.addEventListener('click', function(){ /* futuro: abrir projeto */ });
+      });
+    });
+  }
+
+  function atualizarProjetoAtivo() {
+    if (!projeto) { projActive.hidden = true; return; }
+    projActive.hidden = false;
+    projId.textContent = projeto;
+    fetch('/api/project/' + projeto + '/files').then(function(r){return r.json()}).then(function(d){
+      var html = '';
+      var hasPdf = false, hasTex = false;
+      for (var i = 0; i < d.files.length; i++) {
+        var f = d.files[i];
+        if (f.ext === 'pdf') hasPdf = true;
+        if (f.ext === 'tex') hasTex = true;
+        if (f.ext === 'md' || f.ext === 'tex' || f.ext === 'pdf') {
+          var icon = f.ext === 'md' ? '📝' : (f.ext === 'tex' ? '📐' : '📕');
+          var size = f.size > 1024 ? (f.size/1024).toFixed(1)+'KB' : f.size+'B';
+          html += '<div class="proj-file">' + icon + ' <a href="/api/project/' + projeto + '/file/' + f.name + '" target="_blank">' + f.name + '</a> <span class="ext">' + f.ext + '</span> <span class="size">' + size + '</span></div>';
+        }
+      }
+      projFiles.innerHTML = html || '<div class="proj-file-placeholder">Nenhum arquivo gerado.</div>';
+      btnPdf.disabled = !hasTex;
+      btnZip.disabled = false;
+      btnDelete.disabled = false;
+    });
+    if (btnDiss) {
+      fetch('/api/project/' + projeto + '/dissertacao/status').then(function(r){return r.json()}).then(function(d){
+        if (d.status === 'processando') {
+          renderDissStatus(projeto, d);
+          iniciarPollingDissertacao(projeto);
+        } else if (d.status === 'concluido' || d.status === 'erro') {
+          renderDissStatus(projeto, d);
+        } else {
+          dissStatus.hidden = true;
+          btnDiss.disabled = false;
+          btnDiss.textContent = '📜 Gerar Dissertação Completa (/marceloclaro)';
+        }
+      }).catch(function(){});
+    }
+    carregarProjetos();
+  }
+
+  function criarProjeto() {
+    var ts = new Date().toISOString().slice(0,19).replace('T',' ');
+    return fetch('/api/project/new?titulo=Consulta+' + encodeURIComponent(ts)).then(function(r){return r.json()}).then(function(d){
+      projeto = d.project_id;
+      atualizarProjetoAtivo();
+      return d.project_id;
+    });
+  }
+
+  function salvarResposta(pid, prompt, resposta, meta) {
+    fetch('/api/project/' + pid + '/save', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        prompt: prompt, resposta: resposta,
+        tokens_input: meta.tokens_input||0, tokens_output: meta.tokens_output||0,
+        elapsed: meta.elapsed||0, cost: meta.cost||0
+      })
+    }).then(function(){
+      return fetch('/api/project/' + pid + '/compile');
+    }).then(function(){
+      atualizarProjetoAtivo();
+      showProjectView();
+    }).catch(function(){
+      atualizarProjetoAtivo();
+      showProjectView();
+    });
+  }
+
+  function compilarPdf(pid) {
+    btnPdf.disabled = true;
+    btnPdf.textContent = '▸ PDF…';
+    fetch('/api/project/' + pid + '/compile').then(function(r){return r.json()}).then(function(d){
+      btnPdf.textContent = '▸ PDF';
+      atualizarProjetoAtivo();
+    });
+  }
+
+  // ── Terminal ─────────────────────────────────────────
+  var add = function(cls, html) {
+    var d = document.createElement('div');
+    d.className = 'oct-l b ' + (cls||'');
+    d.innerHTML = html;
+    out.appendChild(d);
+    out.scrollTop = out.scrollHeight;
+  };
+  var streamSpan = function() {
+    var last = out.lastElementChild;
+    if (!last || !last.classList.contains('_s')) {
+      var d = document.createElement('div');
+      d.className = 'oct-l b _s typing';
+      var s = document.createElement('span');
+      d.appendChild(s);
+      out.appendChild(d);
+      last = d;
+    }
+    return last.querySelector('span');
+  };
+
+  document.querySelector('[data-clear]').addEventListener('click', function() {
+    if (abort) abort.abort();
+    setRunning(false);
+    out.innerHTML = '';
+    add('oct-p3', 'Terminal limpo. Digite uma pergunta.');
+    var sp = document.createElement('div'); sp.className = 'oct-l'; sp.style.height = '6px';
+    out.appendChild(sp); inp.focus();
+  });
+
+  document.querySelector('[data-about]').addEventListener('click', function() {
+    add('oct-p4', 'open-code/geologo-digital — OpenCode CLI Terminal');
+    add('oct-p3', 'Modelo........ opencode/deepseek-v4-flash-free');
+    add('oct-p3', 'Projeto....... ' + (projeto || 'nenhum'));
+    add('oct-p3', 'Bridge........ /api/terminal');
+  });
+
+  document.querySelector('[data-proj-refresh]').addEventListener('click', function(){ carregarProjetos(); atualizarProjetoAtivo(); });
+
+  btnPdf.addEventListener('click', function(){ if(projeto) compilarPdf(projeto); });
+  btnZip.addEventListener('click', function(){ if(projeto) window.open('/api/project/' + projeto + '/zip', '_blank'); });
+  btnDelete.addEventListener('click', function(){
+    if (!projeto) { showTerminalView(); add('oct-p3', 'Nenhum projeto ativo para limpar. Faça uma consulta primeiro.'); return; }
+    if (!confirm('Tem certeza que deseja limpar o projeto ' + projeto.slice(0,16) + '…?\nArquivos, PDF e conversas serão removidos permanentemente.')) return;
+    var pid = projeto;
+    fetch('/api/project/' + pid, { method: 'DELETE' }).then(function(r){
+      if (!r.ok) { add('oct-p5', 'erro ao limpar projeto'); return; }
+      projeto = null;
+      projActive.hidden = true;
+      pararPollingDissertacao();
+      if (dissStatus) dissStatus.hidden = true;
+      showTerminalView();
+      add('oct-p3', 'Projeto ' + pid.slice(0,16) + '… limpo.');
+      carregarProjetos();
+    });
+  });
+
+  inp.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    var text = inp.value.trim();
+    if (!text || running) return;
+    inp.value = '';
+    ultimoPrompt = text;
+    setRunning(true);
+
+    // Criar projeto na primeira consulta
+    var promise = projeto ? Promise.resolve(projeto) : criarProjeto();
+
+    promise.then(function(pid){
+      add('', '<span class="oct-prompt">opencode@geomaker:~$</span><span class="oct-p0">' + text.replace(/</g,'&lt;') + '</span>');
+      var url = '/api/terminal?prompt=' + encodeURIComponent(text);
+      abort = new AbortController();
+      lastResposta = '';
+
+      fetch(url, { signal: abort.signal, headers: { Accept: 'text/event-stream' } }).then(function(r) {
+        if (!r.ok) { add('oct-p5', 'erro: HTTP ' + r.status); setRunning(false); return; }
+        var reader = r.body.getReader();
+        var dec = new TextDecoder();
+        var buf = '';
+        function read() {
+          reader.read().then(function(result) {
+            if (result.done) {
+              var last = out.lastElementChild;
+              if (last && last.classList.contains('_s')) last.classList.remove('_s','typing');
+              setRunning(false); inp.focus();
+              var br = document.createElement('div'); br.className = 'oct-l'; br.style.height = '4px';
+              out.appendChild(br);
+              // Salva no projeto
+              if (lastResposta) {
+                salvarResposta(pid, text, lastResposta, lastTokens);
+              }
+              return;
+            }
+            buf += dec.decode(result.value, { stream: true });
+            var lines = buf.split('\n');
+            buf = lines.pop() || '';
+            for (var i = 0; i < lines.length; i++) {
+              var t = lines[i].trim();
+              if (!t || t.startsWith('event:')) continue;
+              if (t.startsWith('data: ')) {
+                try {
+                  var d = JSON.parse(t.slice(6));
+                  if (d.text !== undefined) {
+                    lastResposta += d.text;
+                    streamSpan().textContent += d.text;
+                    out.scrollTop = out.scrollHeight;
+                  } else if (d.tokens_input !== undefined) {
+                    lastTokens = d;
+                    var last = out.lastElementChild;
+                    if (last && last.classList.contains('_s')) last.classList.remove('_s','typing');
+                    add('', '<div class="oct-l b oct-meta"><span>⚡ ' + d.tokens_output + ' tok</span><span>⏱ ' + d.elapsed + 's</span><span>R$ ' + (d.cost||0).toFixed(6) + '</span></div>');
+                  } else if (d.message) { add('oct-p5', 'erro: ' + d.message); }
+                } catch(e) {}
+              }
+            }
+            read();
+          }).catch(function(err) {
+            if (err.name === 'AbortError') add('oct-p3', '^C  interrompido');
+            else add('oct-p5', 'erro: ' + (err.message || 'conexão'));
+            setRunning(false);
+          });
+        }
+        read();
+      }).catch(function(err) {
+        if (err.name === 'AbortError') add('oct-p3', '^C  interrompido');
+        else add('oct-p5', 'erro: ' + (err.message || 'conexão'));
+        setRunning(false);
+      });
+    });
+  });
+
+  inp.focus();
+  carregarProjetos();
+})();
+</script>
+</body>
+</html>

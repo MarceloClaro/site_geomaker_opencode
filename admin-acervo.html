@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cadastro de acervo do Museu Escolar Itinerante Geomaker.">
+  <meta name="theme-color" content="#173f3a"><title>Cadastro de acervo — Geomaker</title>
+  <link rel="icon" href="assets/logo.png" type="image/png"><link rel="stylesheet" href="assets/styles.css">
+  <script defer src="assets/config.js"></script><script defer src="assets/data.js"></script><script defer src="assets/tainacan.js"></script><script defer src="assets/admin-acervo.js"></script><script defer src="assets/site.js"></script>
+</head>
+<body data-page="admin-acervo">
+  <div data-site-header></div>
+  <main id="conteudo">
+    <header class="page-hero">
+      <div class="container"><nav class="breadcrumb" aria-label="Trilha de navegação"><a href="index.html">Início</a><a href="acervo.html">Acervo</a><span>Cadastro</span></nav><div class="page-hero-grid"><div data-reveal><p class="eyebrow">Gestão do acervo</p><h1>Cadastro de <em>itens.</em></h1><p class="lead">Adicione, edite ou remova registros do acervo. Os dados ficam salvos no navegador até serem sincronizados com o Tainacan.</p></div><div class="page-number" aria-hidden="true">ADM</div></div></div>
+    </header>
+
+    <div class="section section-tight">
+      <div class="container">
+        <div class="admin-bar">
+          <p class="admin-count" data-admin-count></p>
+          <a class="button button-outline button-small" href="acervo.html">Ver acervo público <span aria-hidden="true">→</span></a>
+        </div>
+
+        <form class="admin-form" data-admin-form novalidate>
+          <div class="admin-form-header">
+            <h2 data-form-title>Adicionar item</h2>
+            <span class="pill" data-form-id></span>
+          </div>
+          <input type="hidden" name="editing_id" data-admin-editing-id>
+
+          <div class="admin-field-row">
+            <div class="admin-field">
+              <label for="af-title">Título do item</label>
+              <input id="af-title" name="title" data-admin-field="title" type="text" required maxlength="200" placeholder="Ex.: Amonite do período Devoniano">
+            </div>
+            <div class="admin-field">
+              <label for="af-collection">Coleção</label>
+              <select id="af-collection" name="collection" data-admin-field="collection" required>
+                <option value="">Selecionar…</option>
+                <option>Geografia e cartografia</option>
+                <option>Ciências da Terra</option>
+                <option>Ciência e tecnologia</option>
+                <option>Memória e patrimônio</option>
+                <option>Meio ambiente</option>
+                <option>Paleontologia</option>
+                <option>Mineralogia</option>
+                <option>Cartografia escolar</option>
+                <option>Acervo Geomaker</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-field">
+            <label for="af-description">Descrição museológica</label>
+            <textarea id="af-description" name="description" data-admin-field="description" rows="4" required maxlength="2000" placeholder="Contexto, características, estado de conservação e observações educativas."></textarea>
+          </div>
+
+          <div class="admin-field-row">
+            <div class="admin-field">
+              <label for="af-type">Tipologia</label>
+              <input id="af-type" name="type" data-admin-field="type" type="text" required maxlength="100" placeholder="Ex.: Fóssil, Amostra, Maquete">
+            </div>
+            <div class="admin-field">
+              <label for="af-period">Período / Datação</label>
+              <input id="af-period" name="period" data-admin-field="period" type="text" maxlength="100" placeholder="Ex.: Devoniano, Contemporâneo">
+            </div>
+            <div class="admin-field">
+              <label for="af-origin">Origem / Procedência</label>
+              <input id="af-origin" name="origin" data-admin-field="origin" type="text" maxlength="200" placeholder="Município, bacia sedimentar, doação…">
+            </div>
+          </div>
+
+          <div class="admin-field-row">
+            <div class="admin-field">
+              <label for="af-license">Licença / Direitos</label>
+              <input id="af-license" name="license" data-admin-field="license" type="text" maxlength="100" placeholder="Ex.: Uso educativo, CC BY-SA">
+            </div>
+            <div class="admin-field">
+              <label for="af-url">URL externa (opcional)</label>
+              <input id="af-url" name="url" data-admin-field="url" type="url" maxlength="500" placeholder="Link para registro original ou Sketchfab">
+            </div>
+          </div>
+
+          <div class="admin-field-row">
+            <div class="admin-field">
+              <label>Ícone visual</label>
+              <div class="admin-visual-grid" data-admin-visual>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="map" checked><span>🗺️ Mapa</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="rock"><span>🪨 Rocha</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="circuit"><span>⚡ Circuito</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="memory"><span>📖 Memória</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="landscape"><span>🏞️ Paisagem</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="microbit"><span>🤖 micro:bit</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="fossil"><span>🦴 Fóssil</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="mineral"><span>💎 Mineral</span></label>
+                <label class="admin-visual-option"><input type="radio" name="visual" value="default"><span>📦 Geral</span></label>
+              </div>
+            </div>
+            <div class="admin-field">
+              <label class="admin-checkbox">
+                <input type="checkbox" name="featured" data-admin-field="featured" value="true">
+                <span>Destacar no acervo</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="admin-form-actions">
+            <button class="button button-primary" type="submit" data-admin-save>Salvar item</button>
+            <button class="button button-outline" type="button" data-admin-cancel hidden>Cancelar edição</button>
+          </div>
+        </form>
+
+        <div class="admin-search-bar">
+          <input type="search" data-admin-search placeholder="Buscar no cadastro…" aria-label="Buscar itens cadastrados">
+        </div>
+
+        <div class="admin-list" data-admin-list aria-live="polite">
+          <div class="empty-state"><p>Nenhum item cadastrado ainda. Use o formulário acima para adicionar.</p></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div data-site-footer></div><div data-site-search></div>
+</body>
+</html>

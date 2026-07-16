@@ -1,0 +1,52 @@
+# Dependências
+node_modules/
+
+# Dados gerados / operacionais (não fazem parte do código-fonte)
+erros/console_raw.txt
+erros/console_raw.txt.bak
+erros/erro_classificado.txt
+erros/api do google.txt
+erros/*GoogleMapsKey*
+
+# Projetos de consulta do Geólogo Digital (dados de usuário, não código)
+projeto/
+projetos_dados/
+*.pdf
+!docs/**/*.pdf
+
+# Artefatos de compilação LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Arquivos de metadados do Windows (WSL/download via browser)
+*:Zone.Identifier
+*:SmartScreen
+
+# Vendorizados de terceiros (baixe separadamente — ver README)
+TouchTerrain_for_CAGEO-master/
+ancient-earth-master/
+tainacan.1.2.0/
+wsl/vendor/
+*.zip
+
+# Segredos — nunca commitar
+*.pem
+*.key
+**/credentials*.json
+**/service-account*.json
+.env
+.env.*
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editor / OS
+.DS_Store
+Thumbs.db

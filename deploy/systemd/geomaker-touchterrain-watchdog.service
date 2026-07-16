@@ -1,0 +1,8 @@
+[Unit]
+Description=TouchTerrain Watchdog — verifica /main e reinicia geomaker-touchterrain se travado (SPEC-935-R145)
+After=geomaker-touchterrain.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/marceloclaro/opencode-ecosystem-core/scripts/touchterrain_watchdog.py --url http://localhost:8081/main --service geomaker-touchterrain --timeout 10
+User=root

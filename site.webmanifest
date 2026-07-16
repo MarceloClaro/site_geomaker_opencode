@@ -1,0 +1,12 @@
+{
+  "name": "Museu Escolar Itinerante Geomaker",
+  "short_name": "Geomaker",
+  "description": "Ciência, território e memória em movimento.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7f1e5",
+  "theme_color": "#173f3a",
+  "icons": [
+    {"src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml"}
+  ]
+}

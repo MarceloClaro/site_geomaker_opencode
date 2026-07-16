@@ -1,0 +1,217 @@
+% =============================================================================
+% Relatório Acadêmico — Geólogo Digital / OpenCode Ecosystem Core
+% Orquestrador: /marceloclaro
+% Formato: ABNT (NBR 14724, NBR 6023, NBR 10520) — Qualis A1
+% =============================================================================
+\documentclass[
+  a4paper, 12pt, openany, oneside,
+  chapterstyle=ABNT, section=TOCentries
+]{memoir}
+
+% ── Codificação e Idioma ──────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ── Geometria ABNT (3cm superior/esquerda, 2cm inferior/direita) ──────────
+\usepackage{geometry}
+\geometry{
+  top=3cm, bottom=2cm, left=3cm, right=2cm,
+  headheight=1.5cm, headsep=1cm, footskip=1.5cm
+}
+
+% ── Fontes ────────────────────────────────────────────────────────────────
+\usepackage{mathptmx}        % Times New Roman (ABNT recomenda)
+\usepackage[scaled=.92]{helvet}
+\usepackage{courier}
+
+% ── Parágrafos e Espaçamento ABNT ─────────────────────────────────────────
+\setlength{\parindent}{2cm}
+\setlength{\parskip}{0pt}
+\SingleSpacing
+\OnehalfSpacing*
+
+% ── Numeração Progressiva (ABNT NBR 6024) ─────────────────────────────────
+\maxsecnumdepth{subsection}
+\settocdepth{subsection}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+
+% ── Pacotes Essenciais ────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage[hyphens]{url}
+\usepackage[
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue,
+  bookmarks=true,
+  hypertexnames=false
+]{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{lastpage}
+\usepackage{listings}
+\usepackage{textcomp}
+\usepackage{microtype}
+\usepackage{tikz}
+
+% ── Cores institucionais ──────────────────────────────────────────────────
+\definecolor{geoverde}{HTML}{3fb950}
+\definecolor{geocinza}{HTML}{5c6166}
+
+% ── Cabeçalho e Rodapé ────────────────────────────────────────────────────
+\makepagestyle{abnt}
+\makeevenhead{abnt}{\small\itshape Geólogo Digital}{}{\small\thepage}
+\makeoddhead{abnt}{\small\itshape Geólogo Digital}{}{\small\thepage}
+\makeevenfoot{abnt}{}{}{\small\thepage}
+\makeoddfoot{abnt}{}{}{\small\thepage}
+\pagestyle{abnt}
+
+% ── Fich Catalográfica (verso da folha de rosto) ──────────────────────────
+\newcommand{\fichacatalografica}[1]{%
+  \newpage
+  \thispagestyle{empty}
+  \vspace*{\fill}
+  \begin{center}
+  \fboxsep=12pt
+  \fbox{\begin{minipage}[c][6cm]{\textwidth}
+    \centering
+    {\small
+    \begin{tabular}{p{0.12\textwidth}p{0.80\textwidth}}
+      \multicolumn{2}{l}{FICHA CATALOGRÁFICA} \\[6pt]
+      \textbf{Título:} & VAR_TITULO \\
+      \textbf{Data:}   & VAR_DATA \\
+      \textbf{ID:}     & VAR_PROJETO_ID \\
+      \textbf{Modelo:} & opencode/deepseek-v4-flash-free \\
+      \textbf{Tema:}   & VAR_PROMPT \\
+    \end{tabular}
+    }
+  \end{minipage}}
+  \end{center}
+  \vspace*{\fill}
+  \newpage
+}
+
+% ── Lista de Símbolos (se houver) ────────────────────────────────────────
+\newcommand{\listadesimbolos}{%
+  \chapter*{Lista de Símbolos}
+  \thispagestyle{empty}
+  \begin{longtable}{p{4cm}p{10cm}}
+    \texttt{OpenCode} & Plataforma de agentes de IA para engenharia de software \\
+    \texttt{/marceloclaro} & Orquestrador primário do ecossistema \\
+    SSE & Server-Sent Events — streaming de dados \\
+    ABNT & Associação Brasileira de Normas Técnicas \\
+    Qualis A1 & Classificação máxima de periódicos CAPES \\
+    DOI & Digital Object Identifier \\
+  \end{longtable}
+  \newpage
+}
+
+% ── Resumo ────────────────────────────────────────────────────────────────
+\newcommand{\resumoabnt}[1]{%
+  \chapter*{Resumo}
+  \thispagestyle{empty}
+  \OnehalfSpacing
+  #1
+  \vfill
+  \noindent\textbf{Palavras-chave:} geologia, paleontologia, museologia, dissertação acadêmica, OpenCode.
+  \newpage
+}
+
+% =============================================================================
+% INÍCIO DO DOCUMENTO
+% =============================================================================
+\begin{document}
+
+% ── Pré-Textual ───────────────────────────────────────────────────────────
+\frontmatter
+\thispagestyle{empty}
+
+% Capa (ABNT NBR 14724)
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[geoverde!5] (current page.north west) rectangle (current page.south east);
+\end{tikzpicture}
+\vspace*{3cm}
+\begin{center}
+{\large MUSEU GEOMAKER --- OPENCODE ECOSYSTEM CORE}\\[0.5cm]
+{\large Geólogo Digital --- Orquestrador /marceloclaro}\\[4cm]
+{\Huge\bfseries VAR_TITULO}\\[1.5cm]
+{\large Dissertação Técnico-Científica}\\[0.3cm]
+{\large gerada por inteligência artificial --- OpenCode CLI}\\[4cm]
+\vfill
+{\large VAR_DATA}\\[0.3cm]
+\end{center}
+\newpage
+
+% Folha de Rosto
+\thispagestyle{empty}
+\vspace*{4cm}
+\begin{center}
+{\Large\bfseries VAR_TITULO}\\[2cm]
+{\large Dissertação apresentada ao Geólogo Digital ---}\\
+{\large Museu Geomaker --- como resposta à consulta:}\\[1cm]
+\begin{quote}
+\itshape VAR_PROMPT
+\end{quote}
+\end{center}
+\vfill
+\begin{center}
+{\large VAR_DATA}
+\end{center}
+\newpage
+
+% Ficha Catalográfica
+\fichacatalografica{VAR_TITULO}
+
+% Lista de Símbolos
+\listadesimbolos
+
+% Resumo (gerado dinamicamente)
+\resumoabnt{Esta dissertação técnico-científica foi elaborada pelo orquestrador /marceloclaro do OpenCode Ecosystem Core em resposta à consulta do usuário. O conteúdo segue rigor acadêmico com referências reais, DOIs auditáveis e estrutura ABNT Qualis A1.}
+
+% Sumário (ABNT NBR 6027)
+\pdfbookmark[0]{Sumário}{toc}
+\tableofcontents*
+\clearpage
+
+% =============================================================================
+% TEXTO PRINCIPAL
+% =============================================================================
+\mainmatter
+
+VAR_RESPOSTA
+
+\bigskip
+\hrule
+\bigskip
+
+% ── METADADOS ─────────────────────────────────────────────────────────
+\section*{Metadados da Consulta}
+\addcontentsline{toc}{section}{Metadados da Consulta}
+
+\begin{longtable}{p{5cm}p{9cm}}
+\toprule
+\textbf{Parâmetro} & \textbf{Valor} \\
+\midrule
+\endhead
+Modelo & \texttt{opencode/deepseek-v4-flash-free} \\
+Orquestrador & \texttt{/marceloclaro} \\
+Tokens de entrada & VAR_TOKENS_INPUT \\
+Tokens de saída & VAR_TOKENS_OUTPUT \\
+Tempo de execução & VAR_ELAPSED~s \\
+Custo estimado & R\$~VAR_CUSTO \\
+Data da consulta & VAR_DATA \\
+Projeto & \texttt{VAR_PROJETO_ID} \\
+\bottomrule
+\end{longtable}
+
+\bigskip
+\noindent{\small\itshape Nota metodológica: as referências bibliográficas e o apêndice de
+fichamentos/resenhas críticas apresentados nas seções anteriores foram citados pelo
+orquestrador \texttt{/marceloclaro} diretamente no corpo da dissertação, com DOIs e URLs
+convertidos em hyperlinks clicáveis para auditoria e verificação (NBR 6023).}
+
+\end{document}

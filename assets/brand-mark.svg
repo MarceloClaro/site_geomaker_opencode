@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Símbolo do Museu Geomaker</title>
+  <desc id="desc">Linhas topográficas formando um marcador de localização</desc>
+  <path d="M32 4C18.2 4 7 15.2 7 29c0 18.2 25 31 25 31s25-12.8 25-31C57 15.2 45.8 4 32 4Z" fill="#173f3a"/>
+  <path d="M16.5 23.5c7-8.5 23.4-9.1 31-.8M13 31c10-7 28.5-6.6 38 .9M16.2 39.4c8-4 23.2-3.8 31.2.4" fill="none" stroke="#f3e6cd" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="32" cy="28" r="7.8" fill="#df6b3f" stroke="#f3e6cd" stroke-width="2"/>
+  <circle cx="32" cy="28" r="2.4" fill="#173f3a"/>
+</svg>
