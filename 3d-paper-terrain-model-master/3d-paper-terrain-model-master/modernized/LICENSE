@@ -1,0 +1,27 @@
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) 2015 Peter Vojtek (código original)
+ Copyright (C) 2026 Modernização e extensão (Ciclo 1 e Ciclo 2)
+
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
+
+---
+
+Nota de proveniência: o código original (`3d-paper-model.rb` na raiz do
+projeto, 2015, Peter Vojtek) foi publicado sob WTFPL, confirmado no rodapé
+do blogpost original arquivado via Wayback Machine (ver
+`reversa-analysis/02-detective-business-rules.md` e `04-review-report.md`,
+Seção 3.8). Esta licença é adotada para todo o projeto, incluindo o código
+modernizado em `modernized/`, para preservar a intenção de licenciamento
+maximamente permissivo do autor original. Se você preferir uma licença mais
+formalmente reconhecida por ferramentas de compliance corporativo (ex. MIT,
+Apache-2.0), sinta-se livre para substituir este arquivo — a WTFPL permite
+explicitamente isso.

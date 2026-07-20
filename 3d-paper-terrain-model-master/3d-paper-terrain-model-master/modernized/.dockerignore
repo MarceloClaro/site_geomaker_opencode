@@ -1,0 +1,9 @@
+out.svg
+out-preview.png
+*.png
+.git/
+.bundle/
+vendor/bundle/
+output/
+tmp/
+*.gem

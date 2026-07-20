@@ -1,0 +1,23 @@
+# Artefatos gerados pela execucao (nao versionar — sao reproduziveis a partir do codigo)
+out.svg
+out-preview.png
+*.svg
+!template-cut.svg
+*.png
+
+# Excecoes: exemplos de saida ja existentes do projeto legado (fora desta pasta)
+# nao sao afetados por este .gitignore, que se aplica apenas a modernized/.
+
+# Bundler — vendoriza gems localmente (vendor/bundle/), mas versiona a
+# configuracao (.bundle/config) que aponta para esse path, seguindo a
+# convencao comum de projetos que buscam builds isolados/reproduziveis.
+vendor/bundle/
+
+# Ruby
+*.gem
+.rbenv-version
+.ruby-version.bak
+
+# Editor/OS
+.DS_Store
+*.swp

@@ -218,7 +218,7 @@
             </div>
             <div class="oct-input-wrap">
               <span class="oct-prompt">opencode@geomaker:~$</span>
-              <input class="oct-input" data-in placeholder="oque é um fóssil?" autofocus spellcheck="true" autocomplete="off">
+              <input class="oct-input" data-in placeholder="oque é um fóssil?" spellcheck="true" autocomplete="off">
             </div>
           </div>
 
@@ -662,7 +662,8 @@ tainacanAdminUrl: "https://acervo.seudominio.org/wp-admin/",</code></pre>
     });
   });
 
-  inp.focus();
+  // Foca após a página carregar (evita Chrome warning de autofocus duplicado)
+  setTimeout(function(){ inp.focus(); }, 100);
   carregarProjetos();
 })();
 </script>

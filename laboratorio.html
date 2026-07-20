@@ -31,12 +31,12 @@
               <li><span>03</span><p>Clique no globo e use as setas do teclado para avançar ou recuar no tempo.</p></li>
             </ol>
             <div class="external-note"><strong>Versão integrada em português</strong><p>O código, as texturas e os textos ficam hospedados no próprio site. Nenhum rastreador externo é carregado pela experiência.</p></div>
-            <div class="ancient-earth-actions"><a class="button button-primary" href="assets/ancient-earth/index.html#600" target="_blank" rel="noopener noreferrer">Abrir em tela cheia <span class="arrow" aria-hidden="true">↗</span></a><a class="button button-outline" href="https://github.com/MarceloClaro/ancient-earth" target="_blank" rel="noopener noreferrer">Ver código-fonte <span aria-hidden="true">↗</span></a></div>
+            <div class="ancient-earth-actions"><a class="button button-primary" href="assets/ancient-earth/index.html?v=20260717#600" target="_blank" rel="noopener noreferrer">Abrir em tela cheia <span class="arrow" aria-hidden="true">↗</span></a><a class="button button-outline" href="https://github.com/MarceloClaro/ancient-earth" target="_blank" rel="noopener noreferrer">Ver código-fonte <span aria-hidden="true">↗</span></a></div>
           </aside>
 
           <div class="external-lab-frame ancient-earth-frame" data-reveal>
-            <div class="external-frame-bar"><span><i></i> Experiência local · interface em português</span><a href="assets/ancient-earth/index.html#600" target="_blank" rel="noopener noreferrer">Tela cheia ↗</a></div>
-            <iframe data-ancient-earth title="Terra Antiga — globo paleogeográfico interativo em português" src="assets/ancient-earth/index.html#600" loading="lazy" allow="fullscreen"></iframe>
+            <div class="external-frame-bar"><span><i></i> Experiência local · interface em português</span><a href="assets/ancient-earth/index.html?v=20260717#600" target="_blank" rel="noopener noreferrer">Tela cheia ↗</a></div>
+            <iframe data-ancient-earth title="Terra Antiga — globo paleogeográfico interativo em português" src="assets/ancient-earth/index.html?v=20260717#600" allow="fullscreen"></iframe>
           </div>
         </div>
 
@@ -108,11 +108,16 @@
         </div>
 
         <div class="terrain-handoff" data-reveal>
-          <div><p class="eyebrow">Gerador de relevo</p><h3>TouchTerrain em página dedicada.</h3><p>Abra o TouchTerrain em tela cheia para definir a área, ajustar parâmetros e exportar o STL.</p></div>
+          <div><p class="eyebrow">Gerador de relevo · impressão 3D</p><h3>TouchTerrain em página dedicada.</h3><p>Abra o TouchTerrain em tela cheia para definir a área, ajustar parâmetros e exportar o STL.</p></div>
           <div class="terrain-handoff-actions"><a class="button button-primary" href="touchterrain.html">Abrir TouchTerrain <span aria-hidden="true">→</span></a><a class="button button-outline" href="/touchterrain/" target="_blank" rel="noopener noreferrer">Modo externo <span aria-hidden="true">↗</span></a><a class="button button-outline" href="https://github.com/MarceloClaro/TouchTerrain_for_CAGEO" target="_blank" rel="noopener noreferrer">Código CAGEO <span aria-hidden="true">↗</span></a></div>
         </div>
 
-        <p class="lab-credit" data-reveal>TouchTerrain 3.6 é desenvolvido por Chris Harding e Franek Hasiuk. Código local baseado no fork público de Marcelo Claro. A aplicação roda no WSL; consultas de DEM online ainda dependem da autenticação e da disponibilidade do Google Earth Engine.</p>
+        <div class="terrain-handoff" data-reveal>
+          <div><p class="eyebrow">Gerador de relevo · corte de papel · sem servidor</p><h3>Relevo em Papel 3D — roda direto no navegador.</h3><p>Escolha um lugar pelo nome (ou coordenadas) e gere um modelo SVG para cortar em papel — sem WSL, sem instalação, sem custo.</p></div>
+          <div class="terrain-handoff-actions"><a class="button button-primary" href="relevo-papel.html">Abrir Relevo em Papel <span aria-hidden="true">→</span></a></div>
+        </div>
+
+        <p class="lab-credit" data-reveal>TouchTerrain 3.6 é desenvolvido por Chris Harding e Franek Hasiuk. Código local baseado no fork público de Marcelo Claro. A aplicação roda no WSL; consultas de DEM online ainda dependem da autenticação e da disponibilidade do Google Earth Engine. Relevo em Papel 3D é baseado no projeto <em>3d-paper-terrain-model</em> de Peter Vojtek (2015), modernizado e reescrito para rodar 100% no navegador, sem depender do WSL.</p>
       </div>
     </section>
   </main>

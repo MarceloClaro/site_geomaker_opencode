@@ -8,6 +8,29 @@ erros/erro_classificado.txt
 erros/api do google.txt
 erros/*GoogleMapsKey*
 
+# Modelos 3D gerados (saídas do pipeline — enorme)
+saidas/parte-*.svg
+saidas/*/parte-*.svg
+saidas/*/visao-geral.svg
+saidas/*/mapa.html
+saidas/*/instrucoes-montagem.pdf
+saidas/*/instrucoes-montagem.html
+saidas/*/metadados.json.bak
+
+# Cache de elevações (reconstituível via script)
+.elevation_cache/
+
+# Cache de elevações (reconstituível via script)
+.elevation_cache/
+
+# Vendorizados de terceiros (baixe separadamente — ver README)
+3d-paper-terrain-model-master/TouchTerrain_for_CAGEO/
+TouchTerrain_for_CAGEO-master/
+ancient-earth-master/
+tainacan.1.2.0/
+wsl/vendor/
+*.zip
+
 # Projetos de consulta do Geólogo Digital (dados de usuário, não código)
 projeto/
 projetos_dados/
@@ -26,13 +49,6 @@ projetos_dados/
 # Arquivos de metadados do Windows (WSL/download via browser)
 *:Zone.Identifier
 *:SmartScreen
-
-# Vendorizados de terceiros (baixe separadamente — ver README)
-TouchTerrain_for_CAGEO-master/
-ancient-earth-master/
-tainacan.1.2.0/
-wsl/vendor/
-*.zip
 
 # Segredos — nunca commitar
 *.pem

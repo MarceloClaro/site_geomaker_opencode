@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gere um modelo de terreno em papel (SVG) de qualquer localização do planeta, direto no navegador — sem servidor, sem custo.">
+  <meta name="theme-color" content="#173f3a"><title>Relevo em Papel 3D — Geomaker</title>
+  <link rel="icon" href="assets/logo.png" type="image/png"><link rel="stylesheet" href="assets/styles.css">
+  <script defer src="assets/config.js"></script><script defer src="assets/data.js"></script><script defer src="assets/tainacan.js"></script>
+  <script defer src="assets/relevo-papel.js"></script>
+  <script defer src="assets/site.js"></script>
+  <style>
+    .relevo-status { min-height: 64px; max-height: 220px; margin-top: 18px; padding: 14px 16px; overflow-y: auto; border: 1px solid rgba(243,230,205,.16); background: rgba(0,0,0,.2); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .72rem; line-height: 1.7; color: #d8eee7; }
+    .relevo-status:empty::before { content: "O progresso da geração aparecerá aqui."; color: rgba(216,238,231,.45); }
+    .relevo-status-line { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .relevo-preview { display: grid; place-items: center; min-height: 220px; margin-top: 18px; padding: 18px; border: 1px solid rgba(243,230,205,.15); background: rgba(255,255,255,.04); }
+    .relevo-preview img { max-width: 100%; max-height: 360px; background: #fff; }
+    .relevo-preview[aria-busy="true"] { opacity: .6; }
+    .relevo-preview-empty { color: rgba(243,230,205,.5); font-size: .8rem; text-align: center; }
+    .relevo-meta { display: grid; gap: 10px; margin-top: 16px; }
+    .relevo-meta div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(243,230,205,.12); }
+    .relevo-meta span { color: rgba(243,230,205,.55); font-size: .72rem; }
+    .relevo-meta strong { color: var(--white); font-size: .85rem; text-align: right; }
+    .relevo-mode-toggle { display: flex; gap: 8px; margin-bottom: 18px; }
+    .relevo-mode-toggle label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px; border: 1px solid var(--line); border-radius: 2px; font-size: .78rem; font-weight: 700; cursor: pointer; }
+    .relevo-mode-toggle input { accent-color: var(--forest); }
+    .relevo-note-box { margin-top: 22px; padding: 16px 18px; border-left: 4px solid var(--clay); background: rgba(213,99,60,.06); font-size: .78rem; color: var(--ink-soft); }
+    .relevo-download-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .relevo-pagination { display: flex; align-items: center; gap: 12px; margin-top: 14px; justify-content: center; }
+    .relevo-pagination button { min-width: 100px; }
+    .relevo-page-indicator { font-size: .78rem; color: var(--ink-soft); font-weight: 600; min-width: 120px; text-align: center; }
+    .relevo-download-page { font-size: .72rem !important; padding: 6px 12px !important; }
+  </style>
+</head>
+<body data-page="relevo-papel">
+  <div data-site-header></div>
+  <main id="conteudo">
+    <header class="page-hero lab-page-hero">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Trilha de navegação"><a href="index.html">Início</a><a href="laboratorio.html">Laboratório digital</a><span>Relevo em papel 3D</span></nav>
+        <div class="page-hero-grid">
+          <div data-reveal>
+            <p class="eyebrow">Fabricação digital · sem servidor · custo zero</p>
+            <h1>Um relevo de <em>papel</em>, de qualquer lugar do planeta.</h1>
+            <p class="lead">Digite o nome de um lugar (ou informe coordenadas), e o navegador gera na hora um modelo de terreno cortado em fatias — pronto para imprimir, cortar e montar em camadas. Tudo roda no seu navegador; nenhum dado é enviado a servidores do Geomaker.</p>
+          </div>
+          <div class="page-number" aria-hidden="true">08</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="section terrain-lab-section" id="relevo-papel-3d" aria-labelledby="relevo-papel-title">
+      <div class="container">
+        <div class="section-heading" data-reveal>
+          <div><p class="eyebrow">Fatiamento por contorno</p><h2 id="relevo-papel-title">Escolha um lugar e gere o SVG.</h2></div>
+          <p>Baseado no projeto <em>3d-paper-terrain-model</em> (originalmente um script de linha de comando), modernizado e reescrito para rodar 100% no navegador — sem WSL, sem servidor Python, sem chave de API.</p>
+        </div>
+
+        <div class="terrain-workbench" data-reveal>
+          <form class="terrain-configurator" data-relevo-form novalidate>
+            <div class="terrain-form-title"><span class="lab-index">EXPERIMENTO · 03</span><h3>Relevo em Papel</h3><p>Elevação real via Open-Meteo · busca de lugar via Nominatim/OpenStreetMap — ambos gratuitos e sem cadastro.</p></div>
+
+            <fieldset>
+              <legend>1. Escolha a localização</legend>
+              <div class="relevo-mode-toggle" role="radiogroup" aria-label="Como escolher a localização">
+                <label><input type="radio" name="modo-local" value="nome" data-relevo-modo checked> Por nome do lugar</label>
+                <label><input type="radio" name="modo-local" value="coordenadas" data-relevo-modo> Por coordenadas</label>
+              </div>
+
+              <div data-relevo-modo-nome>
+                <div class="terrain-field-grid">
+                  <label class="terrain-field terrain-field-wide"><span>Nome do lugar</span><input name="place" type="text" placeholder="Ex.: Pão de Açúcar, Rio de Janeiro" value="Crateús, Ceará"></label>
+                  <label class="terrain-field"><span>Tamanho da área</span><div class="terrain-input-unit"><input name="sizeKm" type="number" min="0.5" max="200" step="0.5" value="10"><small>km</small></div></label>
+                </div>
+                <p class="terrain-field-note">A busca usa a Nominatim (OpenStreetMap) para encontrar as coordenadas centrais; a área é montada automaticamente ao redor desse ponto.</p>
+              </div>
+
+              <div data-relevo-modo-bbox hidden>
+                <div class="terrain-field-grid terrain-field-grid-four">
+                  <label class="terrain-field"><span>Latitude sul</span><input name="lat0" type="number" min="-90" max="90" step="any" value="-5.2500"></label>
+                  <label class="terrain-field"><span>Longitude oeste</span><input name="lon0" type="number" min="-180" max="180" step="any" value="-40.7500"></label>
+                  <label class="terrain-field"><span>Latitude norte</span><input name="lat1" type="number" min="-90" max="90" step="any" value="-5.1000"></label>
+                  <label class="terrain-field"><span>Longitude leste</span><input name="lon1" type="number" min="-180" max="180" step="any" value="-40.5800"></label>
+                </div>
+                <p class="terrain-field-note">O canto sul/oeste deve ser menor que o canto norte/leste.</p>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>2. Resolução e escala do modelo</legend>
+              <div class="terrain-field-grid terrain-field-grid-four">
+                <label class="terrain-field"><span>Linhas (N-S)</span><input name="latSteps" type="number" min="4" max="200" step="1" value="24" required></label>
+                <label class="terrain-field"><span>Colunas / fatias (L-O)</span><input name="lonSteps" type="number" min="2" max="200" step="1" value="16" required></label>
+                <label class="terrain-field"><span>Exagero vertical</span><div class="terrain-input-unit"><input name="zCms" type="number" min="0.5" max="30" step="0.5" value="6" required><small>cm</small></div></label>
+                <label class="terrain-field"><span>Comprimento nominal</span><div class="terrain-input-unit"><input name="lengthCm" type="number" min="1" max="100" step="0.5" value="10" required><small>cm</small></div></label>
+              </div>
+              <p class="terrain-field-note">Grades menores (ex. 12×8) geram um modelo em poucos segundos, ideal para testar. Grades maiores (ex. 80×24, como o modelo original de referência) podem levar ~2–4 min por causa do limite de requisições da API gratuita de elevação (10 req/min). O progresso é exibido em tempo real.</p>
+            </fieldset>
+
+            <div class="terrain-validation" data-relevo-validation aria-live="polite">Preencha os campos e gere seu modelo.</div>
+            <div class="terrain-actions">
+              <button class="button button-primary" type="submit" data-relevo-submit>Gerar modelo SVG</button>
+              <button class="button button-secondary" type="button" id="btn-servidor" style="background:#8b0000;color:#fff;border:none;padding:8px 16px;border-radius:4px;font-size:.82rem;font-weight:600;cursor:pointer">🚀 Gerar no Servidor (completo)</button>
+              <a class="button button-outline" data-relevo-download hidden download>Baixar SVG <span aria-hidden="true">↓</span></a>
+            </div>
+
+            <div class="relevo-status" data-relevo-status aria-live="polite"></div>
+
+            <!-- Container para resultado do servidor -->
+            <div id="servidor-resultado" style="display:none;margin-top:16px">
+              <hr style="border-color:rgba(243,230,205,.1);margin:12px 0">
+              <p style="font-size:.85rem;color:rgba(216,238,231,.6);margin-bottom:8px">✅ Modelo gerado no servidor:</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                <a class="button button-primary" id="link-abrir-pasta" target="_blank" style="font-size:.78rem;padding:6px 14px">📂 Abrir modelo</a>
+                <a class="button button-outline" id="link-abrir-saidas" href="/saidas/" target="_blank" style="font-size:.78rem;padding:6px 14px">🏔️ Ver todos os modelos</a>
+              </div>
+              <iframe id="iframe-resultado" style="width:100%;height:360px;border:1px solid rgba(243,230,205,.1);border-radius:4px;background:#fff" loading="lazy"></iframe>
+              <div style="margin-top:8px;font-size:.72rem;color:rgba(216,238,231,.35)" id="servidor-info"></div>
+            </div>
+
+            <!-- Navegação entre páginas (multi-page) -->
+            <div class="relevo-pagination" data-relevo-pagination hidden>
+              <button class="button button-small button-outline" data-relevo-prev disabled>← Anterior</button>
+              <span class="relevo-page-indicator" data-relevo-page-indicator>Página 1 de 1</span>
+              <button class="button button-small button-outline" data-relevo-next disabled>Próxima →</button>
+            </div>
+
+            <!-- Downloads por página -->
+            <div class="relevo-download-row" data-relevo-downloads hidden></div>
+          </form>
+
+          <aside class="terrain-summary">
+            <div class="terrain-summary-top"><span class="lab-index">PRÉVIA DO MODELO</span></div>
+            <div class="relevo-preview" data-relevo-preview>
+              <p class="relevo-preview-empty" data-relevo-preview-empty>O modelo aparecerá aqui após a geração.</p>
+              <img data-relevo-preview-img alt="Prévia do modelo de terreno em papel gerado" hidden>
+            </div>
+            <div class="relevo-meta" data-relevo-meta></div>
+            <div class="terrain-summary-note"><strong>O que será criado</strong><p>Conjunto de páginas A4 com fatias de relevo em escala real, curvas Bezier suaves, cores por altitude e slots de encaixe. O modelo é gerado inteiramente no navegador — nenhum dado passa por servidor.</p></div>
+          </aside>
+        </div>
+
+        <div class="relevo-note-box" data-reveal>
+          <strong>Como funciona, tecnicamente:</strong> a página busca as coordenadas do lugar (Nominatim/OpenStreetMap), consulta a elevação real de cada ponto da grade (Open-Meteo Elevation API) e monta o SVG inteiramente no seu navegador — nenhum dado passa por um servidor do Geomaker. Ambas as APIs são gratuitas, sem necessidade de chave ou cadastro. Ver <a href="https://github.com/MarceloClaro" target="_blank" rel="noopener noreferrer">o histórico completo de engenharia reversa e modernização</a> deste projeto.
+        </div>
+
+        <div class="terrain-handoff" data-reveal>
+          <div><p class="eyebrow">Ferramentas relacionadas</p><h3>Precisa de um modelo para impressão 3D?</h3><p>Para modelos STL/OBJ destinados a impressoras 3D (não corte de papel), use o TouchTerrain, também disponível no laboratório.</p></div>
+          <div class="terrain-handoff-actions"><a class="button button-primary" href="touchterrain.html">Abrir TouchTerrain <span aria-hidden="true">→</span></a><a class="button button-outline" href="laboratorio.html#relevo-3d">← Laboratório digital</a></div>
+        </div>
+
+        <p class="lab-credit" data-reveal>Baseado no projeto <em>3d-paper-terrain-model</em>, originalmente de Peter Vojtek (2015, licença WTFPL). Modernizado (troca da extinta API MapQuest pela Open-Meteo) e reescrito para rodar 100% no navegador pela equipe Geomaker. Dados de elevação: Open-Meteo (dataset Copernicus GLO-90, ~90 m de resolução). Geocodificação: Nominatim/OpenStreetMap.</p>
+      </div>
+    </section>
+  </main>
+  <div data-site-footer></div>
+  <div data-site-search></div>
+
+<script>
+// =========================================================================
+// Conector Servidor — Relevo em Papel 3D
+// =========================================================================
+(function() {
+  const btn = document.getElementById('btn-servidor');
+  const status = document.querySelector('[data-relevo-status]');
+  const resultado = document.getElementById('servidor-resultado');
+  const iframeR = document.getElementById('iframe-resultado');
+  const linkAbrir = document.getElementById('link-abrir-pasta');
+  const info = document.getElementById('servidor-info');
+
+  if (!btn) return;
+
+  btn.addEventListener('click', async function() {
+    // Coletar dados do formulário
+    const form = document.querySelector('[data-relevo-form]');
+    const formData = new FormData(form);
+
+    // Detectar modo: nome vs coordenadas
+    const modoNome = document.querySelector('[name="modo-local"]:checked')?.value === 'nome';
+
+    const params = {};
+    if (modoNome) {
+      params.place = formData.get('place') || 'Crateús, Ceará';
+      params.sizeKm = parseFloat(formData.get('sizeKm')) || 10;
+    } else {
+      params.lat0 = parseFloat(formData.get('lat0')) || -5.25;
+      params.lon0 = parseFloat(formData.get('lon0')) || -40.75;
+      params.lat1 = parseFloat(formData.get('lat1')) || -5.10;
+      params.lon1 = parseFloat(formData.get('lon1')) || -40.58;
+    }
+    params.latSteps = Math.min(parseInt(formData.get('latSteps')) || 80, 200);
+    params.lonSteps = Math.min(parseInt(formData.get('lonSteps')) || 48, 200);
+    params.zCms = parseFloat(formData.get('zCms')) || 8;
+    params.lengthCm = parseFloat(formData.get('lengthCm')) || 12;
+
+    // Parâmetros avançados
+    params.gapCm = 0.01;
+    params.smoothPasses = 3;
+
+    // Desabilitar botão durante geração
+    btn.disabled = true;
+    btn.textContent = '⏳ Gerando...';
+    status.innerHTML = '<div class="relevo-status-line">🚀 Iniciando geração no servidor...</div>';
+    resultado.style.display = 'none';
+
+    // Criar SSE clientId
+    const clientId = 'geo_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+
+    // Escutar SSE
+    let sseDone = false;
+    const evtSource = new EventSource(`/api/relevo/gerar/sse?clientId=${clientId}`);
+
+    evtSource.onmessage = function(evt) {
+      try {
+        const data = JSON.parse(evt.data);
+        if (data.clientId) return; // connected event
+
+        const line = document.createElement('div');
+        line.className = 'relevo-status-line';
+        line.textContent = data.message || data.step;
+        status.appendChild(line);
+        status.scrollTop = status.scrollHeight;
+
+        if (data.step === 'complete') {
+          sseDone = true;
+          evtSource.close();
+          // Exibir resultado
+          resultado.style.display = 'block';
+          linkAbrir.href = data.pasta || '#';
+          iframeR.src = data.pasta || '/saidas/';
+          info.textContent = `📊 ${data.metadados?.resolucao || ''} · ${data.metadados?.pico || 'pico N/A'} · ${data.metadados?.paginas || ''} páginas · ${data.metadados?.arquivos || 0} arquivos`;
+          btn.disabled = false;
+          btn.textContent = '🚀 Gerar no Servidor (completo)';
+          status.innerHTML += '<div class="relevo-status-line" style="color:#4cdf8b">✅ Modelo gerado com sucesso!</div>';
+        } else if (data.step === 'error') {
+          sseDone = true;
+          evtSource.close();
+          status.innerHTML += `<div class="relevo-status-line" style="color:#e88">❌ ${data.message}</div>`;
+          btn.disabled = false;
+          btn.textContent = '🚀 Gerar no Servidor (completo)';
+        }
+      } catch(e) {}
+    };
+
+    evtSource.onerror = function() {
+      if (!sseDone) {
+        status.innerHTML += '<div class="relevo-status-line" style="color:#e88">⚠️ Conexão SSE perdida — mas a geração continua...</div>';
+      }
+    };
+
+    // Chamar API
+    params._sseClientId = clientId;
+
+    try {
+      const resp = await fetch('/api/relevo/gerar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+
+      if (!resp.ok) {
+        let errMsg = `HTTP ${resp.status}`;
+        try {
+          const err = await resp.json();
+          errMsg = err.error || `HTTP ${resp.status}`;
+        } catch {
+          // Resposta não-JSON (ex.: HTML de erro do nginx)
+          errMsg = `Servidor indisponível (${resp.status}). Tente novamente.`;
+        }
+        throw new Error(errMsg);
+      }
+
+      const result = await resp.json();
+      if (!sseDone) {
+        // SSE pode ter fechado antes do complete, exibir resultado
+        evtSource.close();
+        resultado.style.display = 'block';
+        linkAbrir.href = result.pasta_url || '#';
+        iframeR.src = result.pasta_url || '/saidas/';
+        info.textContent = `📊 ${result.metadados?.resolucao || ''} · ${result.metadados?.pico || ''} · ${result.metadados?.arquivos_gerados || 0} arquivos`;
+        btn.disabled = false;
+        btn.textContent = '🚀 Gerar no Servidor (completo)';
+        status.innerHTML += '<div class="relevo-status-line" style="color:#4cdf8b">✅ Modelo gerado!</div>';
+      }
+    } catch(err) {
+      if (!sseDone) {
+        evtSource.close();
+        status.innerHTML += `<div class="relevo-status-line" style="color:#e88">❌ Erro: ${err.message}</div>`;
+        btn.disabled = false;
+        btn.textContent = '🚀 Gerar no Servidor (completo)';
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

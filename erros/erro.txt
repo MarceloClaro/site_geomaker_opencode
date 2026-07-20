@@ -1,17 +1,77 @@
-════════════════════════════════════════════════════════
-═ CONSOLE ERROR ANALYZER — Relatório de Erros
-═ 10 linhas analisadas
-════════════════════════════════════════════════════════
+===== REGISTRO DE ERROS — GEOMAKER RELEVO 3D =====
+Última atualização: 2026-07-20
 
-── Categorias ──────────────────────────────────
-  Extensões Chrome: 9
-  Infraestrutura: 1
+=== HISTÓRICO ===
 
-── Fontes ───────────────────────────────────────
-  cloudflare: 1
-  eesel AI: 3
-  refresh: 2
-  searchitfastnow: 4
+[2026-07-20] ERRO: "unexpected token '<'" no frontend (relevo-papel.html:261)
+  CAUSA: Backend Node.js caído → nginx retorna página HTML 502
+         → frontend tenta resp.json() no HTML → erro de parsing
+  RASTREAMENTO:
+    - Node server morre por erro não tratado (ex: Open-Meteo 429)
+    - nginx proxy gera HTML 502 Bad Gateway
+    - relevo-papel.html linha 261: `const err = await resp.json()` → falha
+  CORREÇÕES:
+    1. Frontend (relevo-papel.html:258-266): try/catch no resp.json()
+       com fallback para texto se resposta não-JSON
+    2. Backend (relevo-server.cjs): adicionados handlers globais
+       process.on("uncaughtException") e process.on("unhandledRejection")
+       para impedir que o processo morra silenciosamente
+    3. nginx (sites-enabled/geomaker): proxy_intercept_errors on + @erro_api
+       retorna JSON padrão {"error":"Servidor temporariamente indisponível"}
+       em vez de HTML nos endpoints /api/ e /api/relevo/
+    4. Watchdog (scripts/watchdog-node.sh): verifica Node a cada 30s,
+       reinicia se cair. Iniciado pelo restart-all.sh
+  STATUS: ✅ Resolvido (3 frentes: frontend + backend + nginx + watchdog)
 
-═══ ZERO ERROS DE CÓDIGO DO SITE ═══
+[2026-07-20] ERRO: (lonSteps/6).ceil no relevo-server.cjs
+  CAUSA: JavaScript não tem .ceil em Number (é Math.ceil())
+  CORREÇÃO: Substituído por `Math.ceil(lonSteps / 6)` na linha 206
+  STATUS: ✅ Resolvido
 
+[2026-07-20] ERRO: Bridge OpenCode /api/terminal retornando 503
+  CAUSA: Binário opencode não encontrado pelo server.py
+  CORREÇÃO: server.py atualizado com _resolve_opencode_bin() dinâmica
+            que busca em múltiplos locais (incluindo /mnt/c/...)
+  STATUS: ✅ Resolvido
+
+[2026-07-19] ERRO: Open-Meteo API retornando 429 (rate limit)
+  CAUSA: Limite diário excedido (múltiplas requisições de elevação)
+  AÇÃO: Cache sintético gerado para Corcovado em .elevation_cache/
+  STATUS: ⏳ Pendente — regenerar com dados reais quando API liberar
+          Comando: rm .elevation_cache/1ce5c6d9*.json && bash gerar-corcovado.sh --force
+
+[2026-07-19] ERRO: 3d-paper-model.rb: NoMethodError — iso8601
+  CAUSA: Ruby < 3.0 não tem Time#iso8601 nativo (precisa 'time' lib)
+  CORREÇÃO: Substituído por Time.now.utc.strftime (compatível todas versões)
+  STATUS: ✅ Resolvido
+
+=== PRÓXIMOS PASSOS ===
+1. ✅ Corrigir frontend para fallback JSON→texto (relevo-papel.html)
+2. ✅ Configurar nginx para retornar JSON em erro 502 nas APIs
+3. ✅ Adicionar handlers de exceção global no Node.js
+4. ⏳ Regenerar Corcovado com dados reais quando Open-Meteo liberar
+5. ❌ (pendente)
+
+[2026-07-20] CORCOVADO HD GERADO — Alta Resolução Milimetrada (240×192)
+  PARÂMETROS:
+    - Grade: 240×192 (vs 160×128 original — 90% mais pontos)
+    - Exagero vertical: z_cms=10 (vs 8)
+    - Comprimento: length_cm=14 (vs 12)
+    - Gap: 0.01cm (0.1mm — precisão sub-milimétrica)
+    - Suavização: 3 passadas
+    - Páginas: 48 folhas A4 (vs 26)
+  DADOS DE ELEVAÇÃO:
+    - Interpolação bilinear do cache 160×128 existente
+    - API Open-Meteo estava em rate limit (429) — evitada
+    - Cache key: 7cae7878... para 240×192
+  PICO: 513.7m em (-22.94947, -43.22968)
+  NOTCHES: 2400 V + 2208 H ≈ 1.08:1 (essencialmente balanceado)
+  POLYLINES: 4608 totais (192 fatias + 4416 notches)
+  CORREÇÕES NO PIPELINE:
+    1. Ruby 3d-paper-model.rb: naming de páginas mudou de letras (a-z, {, |, ...)
+       para números (01-48) — suporta >26 páginas sem caracteres inválidos
+    2. gerar-instrucoes-pdf.rb: Dir.glob 'parte-*.svg' (não mais 'parte-?.svg')
+    3. gerar-instrucoes-pdf.rb: File.read com encoding: 'UTF-8' + # encoding: UTF-8
+    4. gerar-instrucoes-pdf.rb: texto de instruções atualizado para numeração
+  STATUS: ✅ Completo — 48 páginas A4, 4608 polylines, mapa OSM, PDF instruções
+  ACESSO: http://localhost:8080/saidas/corcovado-240x192/

@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+ruby '>= 3.0'
+
+# Zero dependencias de runtime alem da stdlib do Ruby (uri, net/http, json,
+# optparse) — decisao deliberada preservada do Ciclo 1 (ver
+# reversa-analysis/specs/design.md, RNF-05: "3 stdlibs apenas"). O Gemfile
+# existe para: (1) travar a versao minima do Ruby: (2) formalizar minitest e
+# rake como dependencias de desenvolvimento/teste, evitando depender de que
+# essas gems "acontecam" de estar instaladas globalmente no ambiente de
+# quem for rodar o projeto.
+
+group :development, :test do
+  gem 'minitest', '~> 5.20'
+  gem 'rake', '~> 13.0'
+end

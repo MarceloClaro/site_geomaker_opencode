@@ -87,7 +87,7 @@
   </div>
   <div class="input-wrap">
     <span class="prompt">opencode@geomaker:~$</span>
-    <input class="input" data-in placeholder="oque é um fóssil?" autofocus spellcheck="true" autocomplete="off">
+    <input class="input" data-in placeholder="oque é um fóssil?" spellcheck="true" autocomplete="off">
   </div>
 </div>
 
@@ -95,6 +95,8 @@
 (function(){
   const out = document.querySelector('[data-out]');
   const inp = document.querySelector('[data-in]');
+  // Foca o input após a página carregar (evita warning Chrome de autofocus duplicado)
+  setTimeout(() => inp && inp.focus(), 100);
   document.querySelector('[data-clear]').addEventListener('click', () => {
     if (abort) abort.abort();
     running = false; inp.disabled = false;

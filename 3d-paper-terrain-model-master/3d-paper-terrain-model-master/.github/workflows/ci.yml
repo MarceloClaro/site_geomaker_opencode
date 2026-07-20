@@ -1,0 +1,71 @@
+name: CI
+
+# NOTA DE HONESTIDADE (anti-overclaim): este workflow foi escrito e revisado
+# cuidadosamente (sintaxe YAML validada, actions oficiais e amplamente usadas),
+# mas NAO PODE ser executado/validado neste ambiente de desenvolvimento, pois
+# nao ha acesso ao GitHub Actions runner nem a ferramenta `act` para simulacao
+# local. Valide na primeira execucao real apos o push (Actions > CI, na aba
+# do repositorio) antes de confiar cegamente nele. Ver
+# reversa-analysis/specs/tasks.md, T-22, para o registro dessa limitacao.
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'modernized/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'modernized/**'
+      - '.github/workflows/ci.yml'
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: Sintaxe + testes automatizados (sem rede)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modernized
+    strategy:
+      matrix:
+        ruby-version: ['3.0', '3.1', '3.2', '3.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Ruby ${{ matrix.ruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+          working-directory: modernized
+
+      - name: Verificar sintaxe de todos os .rb
+        run: bundle exec rake syntax_check
+
+      - name: Rodar suite de testes (28 testes, logica pura, sem rede)
+        run: bundle exec rake test
+
+  smoke:
+    name: Smoke test (execucao real, toca a rede da Open-Meteo)
+    runs-on: ubuntu-latest
+    needs: test
+    # Smoke test faz chamadas de rede reais a um servico publico gratuito de
+    # terceiros; roda apenas no push a main/master (nao em todo PR de fork)
+    # para respeitar o rate limit compartilhado do servico.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        working-directory: modernized
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: modernized
+
+      - name: Smoke test de ponta a ponta (grade reduzida 10x8)
+        run: bundle exec rake smoke

@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# bin/setup — prepara e verifica o ambiente de execucao do projeto.
+#
+# Uso: ./bin/setup
+#
+# Verifica: versao do Ruby, disponibilidade de minitest/rake (via bundler se
+# possivel, com fallback gracioso para gems ja instaladas globalmente — ver
+# nota no README sobre restricoes de bundler em ambientes sandbox), roda a
+# suite de testes e um smoke test de execucao real (rede).
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+bold() { printf '\033[1m%s\033[0m\n' "$1"; }
+ok()   { printf '  [OK] %s\n' "$1"; }
+fail() { printf '  [FALHOU] %s\n' "$1"; }
+
+bold "==> 1/5 — Verificando versao do Ruby (requer >= 3.0)"
+if ! command -v ruby >/dev/null 2>&1; then
+  fail "Ruby nao encontrado no PATH. Instale Ruby 3.0+ antes de continuar."
+  exit 1
+fi
+RUBY_VERSION_STR="$(ruby -e 'print RUBY_VERSION')"
+RUBY_MAJOR="$(echo "$RUBY_VERSION_STR" | cut -d. -f1)"
+if [ "$RUBY_MAJOR" -lt 3 ]; then
+  fail "Ruby $RUBY_VERSION_STR encontrado, mas este projeto requer >= 3.0."
+  exit 1
+fi
+ok "Ruby $RUBY_VERSION_STR"
+
+bold "==> 2/5 — Verificando dependencias (minitest, rake)"
+if command -v bundle >/dev/null 2>&1; then
+  if bundle install --quiet 2>/dev/null; then
+    ok "dependencias instaladas via 'bundle install'"
+  else
+    echo "  [aviso] 'bundle install' falhou; tentando usar gems ja instaladas globalmente..."
+  fi
+else
+  echo "  [aviso] 'bundle' nao encontrado no PATH deste ambiente (comum em ambientes sandbox/CI restritos)."
+  echo "          Prosseguindo com gems ja instaladas globalmente, se disponiveis."
+fi
+
+MISSING=0
+for gem_name in minitest rake; do
+  if ruby -e "gem '$gem_name'" >/dev/null 2>&1; then
+    ok "gem '$gem_name' disponivel"
+  else
+    fail "gem '$gem_name' NAO disponivel — rode: gem install $gem_name"
+    MISSING=1
+  fi
+done
+if [ "$MISSING" -eq 1 ]; then
+  exit 1
+fi
+
+bold "==> 3/5 — Verificando sintaxe de todos os arquivos .rb"
+rake syntax_check
+
+bold "==> 4/5 — Rodando a suite de testes automatizados"
+rake test
+
+bold "==> 5/5 — Smoke test: execucao real de ponta a ponta (grade reduzida, toca a rede)"
+rake smoke
+
+echo ''
+bold "=================================================="
+bold " Ambiente pronto para execucao. Proximos passos:"
+bold "   ruby 3d-paper-model.rb --help"
+bold "   ruby 3d-paper-model.rb                    # modelo de Poľana (default)"
+bold "   ruby 3d-paper-model.rb --place \"Seu Lugar\" --size-km 15"
+bold "=================================================="

@@ -1,90 +1,6 @@
 # Museu Escolar Itinerante Geomaker — site
 
-Pacote funcional e responsivo com site estático, Terra Antiga em português, servidor local do TouchTerrain e terminal com IA (Geólogo Digital). A visualização básica pode ser aberta em qualquer hospedagem HTML; o instalador de um único comando entrega a experiência completa no Windows via WSL.
-
-## Instalação para quem nunca usou o terminal (passo a passo)
-
-Estas instruções não exigem conhecimento técnico. Siga na ordem, sem pular etapas. No total leva de 15 a 30 minutos, a maior parte é apenas espera.
-
-### Parte 1 — Instalar o WSL (só na primeira vez, se seu computador ainda não tem)
-
-O WSL é um recurso do Windows que permite rodar programas de Linux. Se você não sabe se já tem, siga estes passos — não tem problema repetir se já estiver instalado.
-
-1. Clique no menu **Iniciar** do Windows, digite `PowerShell`, clique com o botão direito em **Windows PowerShell** e escolha **Executar como administrador**.
-2. Uma janela azul vai abrir pedindo confirmação — clique em **Sim**.
-3. Digite exatamente este comando e pressione Enter:
-
-   ```powershell
-   wsl --install
-   ```
-
-4. Aguarde o download terminar (pode levar alguns minutos). Quando pedir, **reinicie o computador**.
-5. Depois de reiniciar, o Ubuntu abre automaticamente numa janela preta (terminal). Se não abrir, procure **Ubuntu** no menu Iniciar e abra.
-6. Na primeira vez, ele vai pedir para você **criar um nome de usuário** e uma **senha** — pode ser qualquer nome, sem espaços ou acentos (ex.: `maria`, `joao123`). Digite e pressione Enter. Ao digitar a senha, as letras não aparecem na tela — isso é normal, é só continuar digitando e pressionar Enter. **Anote esse usuário e senha em algum lugar**, você vai precisar deles depois.
-
-### Parte 2 — Instalar o Museu Geomaker (um único comando)
-
-1. Abra o terminal **Ubuntu** (procure "Ubuntu" no menu Iniciar do Windows).
-2. Copie o comando abaixo por completo (o botão de copiar aparece ao passar o mouse sobre o bloco de código).
-3. Cole no terminal Ubuntu — no Windows Terminal, cole com `Ctrl+Shift+V` ou clique com o botão direito do mouse. Pressione Enter.
-
-   ```bash
-   curl -fsSL https://raw.githubusercontent.com/marceloclaro/site_geomaker_opencode/main/instalar.sh | bash
-   ```
-
-4. O terminal vai pedir sua senha do Ubuntu (a que você criou na Parte 1) — digite-a e pressione Enter. As letras não aparecem, é normal.
-5. Agora é só esperar. O instalador mostra `[passo X de Y]` conforme avança. **Não feche a janela** até aparecer a mensagem final `Tudo pronto!`.
-6. Se aparecer algum erro em vermelho, execute o mesmo comando de novo — o instalador é seguro para repetir e geralmente resolve na segunda tentativa (falhas de rede são as mais comuns).
-
-### Parte 3 — Acessar o museu
-
-1. Abra o navegador (Chrome, Edge ou Firefox) **no Windows** normalmente.
-2. Digite na barra de endereço: `http://localhost:8080`
-3. O site do museu deve aparecer. Clique em **Acervo** para testar o terminal do Geólogo Digital.
-
-### Passos extras opcionais (podem ser feitos depois, quando quiser)
-
-Essas duas etapas não são obrigatórias — o site funciona sem elas, mas alguns recursos ficam mais completos:
-
-**Ativar o terminal de IA (conversar com o Geólogo Digital):**
-
-No terminal Ubuntu, digite:
-
-```bash
-opencode auth login
-```
-
-Um link vai aparecer — copie e cole no navegador, faça login com sua conta (Google, GitHub, etc.) uma única vez.
-
-**Ativar dados de terreno reais no gerador 3D (Earth Engine do Google):**
-
-No terminal Ubuntu, digite:
-
-```bash
-bash ~/Geomaker_site/wsl/autenticar-earthengine.sh
-```
-
-Siga as instruções que aparecerem (abrir um link, fazer login com uma conta Google, colar um código).
-
-### Usar depois de reiniciar o computador
-
-O museu continua funcionando mesmo depois de reiniciar o Windows — o WSL mantém os serviços rodando em segundo plano. Se o site não abrir em `http://localhost:8080`, abra o terminal Ubuntu e digite:
-
-```bash
-bash ~/Geomaker_site/wsl/start.sh
-```
-
-Para verificar se tudo está funcionando corretamente:
-
-```bash
-bash ~/Geomaker_site/wsl/status.sh
-```
-
-### Se algo der errado
-
-- **"comando não encontrado" ou tela cheia de erro em vermelho**: copie a mensagem de erro e peça ajuda a alguém com mais experiência, ou execute o comando da Parte 2 novamente.
-- **o site não abre**: rode `bash ~/Geomaker_site/wsl/status.sh` e veja quais itens aparecem como `[FALHA]` ou `[ATENÇÃO]`.
-- **preciso recomeçar do zero**: pode rodar o comando da Parte 2 quantas vezes quiser, ele não duplica nada.
+Pacote funcional e responsivo com site estático, Terra Antiga em português e servidor local do TouchTerrain. A visualização básica pode ser aberta em qualquer hospedagem HTML; o pacote WSL instala a experiência completa no Windows.
 
 ## Direção visual
 
@@ -111,17 +27,25 @@ npm test
 
 O projeto segue SDD e TDD. A especificação atual está em `docs/specs/001-site-local-wsl.md`, o processo em `docs/SDD_TDD.md` e `npm test` executa tanto os testes das páginas quanto os testes estruturais do pacote WSL. Para desenvolver, use Node.js 20 ou superior.
 
-## Instalação completa no WSL (modo manual/avançado)
+## Instalação completa no WSL
 
-A seção **Instalação para quem nunca usou o terminal**, no início deste documento, cobre o caminho recomendado com um único comando (`instalar.sh`). Esta seção é para quem já tem experiência com terminal e prefere clonar o repositório manualmente:
+No Ubuntu/WSL, extraia `Geomaker_site.zip` em uma pasta Linux e execute:
 
 ```bash
-git clone https://github.com/marceloclaro/site_geomaker_opencode.git ~/Geomaker_site
-cd ~/Geomaker_site
 bash wsl/setup.sh
 ```
 
-O instalador configura Nginx, Node.js, o CLI OpenCode, Python, GDAL, Earth Engine, Gunicorn, o TouchTerrain e a ponte OpenCode (terminal do Geólogo Digital). O museu fica em `http://localhost:8080` (que já inclui o proxy para o TouchTerrain e para a ponte OpenCode) e o gerador topográfico standalone em `http://localhost:8081`. Consulte `INICIAR_NO_WSL.md` para o roteiro completo, autenticação do Earth Engine, atualização do site e comandos de operação.
+O instalador configura Nginx, Python, GDAL, Earth Engine, Gunicorn e o TouchTerrain. O museu fica em `http://localhost:8080` e o gerador topográfico em `http://localhost:8081`. Consulte `INICIAR_NO_WSL.md` para o roteiro completo, autenticação do Earth Engine, atualização do site e comandos de operação.
+
+> ⚠️ **Importante:** o Nginx **não** serve os arquivos diretamente deste repositório — ele
+> serve uma cópia separada em `/opt/geomaker/site/`. Editar páginas/assets aqui **não**
+> atualiza automaticamente `http://localhost:8080` nem o túnel público. Depois de qualquer
+> alteração, sincronize com:
+> ```bash
+> bash wsl/sincronizar-local.sh
+> ```
+> (atalho de desenvolvimento; para publicar a partir de um ZIP externo, use
+> `wsl/receber-site.sh` conforme a seção **Publicação**, mais abaixo.)
 
 ## Estrutura
 
@@ -138,11 +62,6 @@ O instalador configura Nginx, Node.js, o CLI OpenCode, Python, GDAL, Earth Engin
 - `assets/config.js`: configuração do Tainacan e do contato institucional.
 - `assets/tainacan.js`: cliente da API pública do Tainacan.
 - `assets/acervo/`: fotografias institucionais do acervo exibidas na página inicial e na galeria.
-- `terminal.html`: terminal OpenCode standalone (fora do acervo, mesma ponte).
-- `opencode-bridge/`: ponte FastAPI entre o site e o OpenCode CLI (terminal, projetos, dissertações).
-- `deploy/`: artefatos de implantação — Nginx, unidades systemd, watchdog, analisador de erros de console.
-- `specs/`: especificações SDD com critérios de aceitação testáveis (SPEC-935-R143 a R145).
-- `docs/`, `tests/`: documentação e testes estruturais do próprio site (Node.js).
 
 ## Galeria fotográfica e registros 3D
 
@@ -178,58 +97,6 @@ xAI:    POST https://api.x.ai/v1/responses
 
 Para testar, sirva a pasta por HTTP conforme a seção **Abrir localmente**, abra **Acervo → Geólogo Digital**, escolha o provedor, cole uma chave válida, selecione ou envie uma imagem e pressione **Analisar peça**.
 
-## Geólogo Digital — terminal OpenCode e dissertações acadêmicas
-
-Além da análise de imagem, `acervo.html` incorpora um **terminal interativo** (`opencode@geomaker:~$`) que conversa com o modelo `opencode/deepseek-v4-flash-free` via streaming SSE, sem exigir chave própria do visitante — a chamada ao modelo acontece no servidor, através de uma ponte FastAPI (`opencode-bridge/`).
-
-### Arquitetura
-
-```text
-Navegador (acervo.html)
-   │  SSE  GET /api/terminal?prompt=...
-   ▼
-Nginx (proxy_buffering off, keep-alive)
-   ▼
-opencode-bridge/server.py (FastAPI, porta 8082)
-   │  subprocess: opencode run --format json --model ...
-   ▼
-OpenCode CLI → modelo LLM
-```
-
-- **Chat rápido**: cada pergunta gera uma dissertação estruturada (introdução, desenvolvimento, considerações finais, referências com DOI/URL, apêndice de fichamentos) diretamente pelo modelo, sem o overhead do orquestrador completo — resposta típica em 15–30s.
-- **Dissertação completa sob demanda**: o botão *"📜 Gerar Dissertação Completa (/marceloclaro)"* delega ao orquestrador multi-agente `/marceloclaro` em segundo plano (não bloqueia o chat), com polling de status a cada 4s. Leva de 1 a 3 minutos e produz um documento mais aprofundado.
-- **Projetos por consulta**: cada pergunta cria uma pasta (`/api/project/new`) com `consulta-*.md`, `relatorio-*.tex` e `relatorio-*.pdf` — o `.tex` usa o template ABNT (`opencode-bridge/templates/relatorio.tex`, classe `memoir`) com capa, ficha catalográfica, sumário automático, referências convertidas em hyperlinks `\href{https://doi.org/...}` (auditáveis) e apêndice de fichamentos/resenhas críticas.
-- **Painel lateral**: lista de projetos, download de PDF/ZIP/MD, botão de limpeza (com confirmação) e link direto para `erros/erro.txt` classificado.
-
-### Executar o bridge
-
-```bash
-cd opencode-bridge
-python3 -m venv venv && source venv/bin/activate
-pip install fastapi "uvicorn[standard]"
-python3 -m uvicorn server:app --host 127.0.0.1 --port 8082
-```
-
-Variáveis de ambiente aceitas: `OPENCODE_BIN` (caminho do binário `opencode`), `OPENCODE_MODEL` (padrão `opencode/deepseek-v4-flash-free`), `OPENCODE_AGENT` (padrão `marceloclaro`, usado só na geração de dissertação em background), `OPENCODE_WORK_DIR`.
-
-### Implantação (Nginx + systemd + watchdog)
-
-Os artefatos de implantação usados em produção (WSL/Ubuntu) estão em `deploy/`:
-
-- `deploy/nginx/geomaker.conf`: proxy reverso — site estático na raiz, `/api/` para o bridge (`proxy_buffering off` é essencial para o streaming SSE não travar em buffer), `/main`, `/export`, `/touchterrain/` etc. para o TouchTerrain local.
-- `deploy/systemd/geomaker-opencode-bridge.service`: roda o bridge FastAPI como serviço.
-- `deploy/systemd/geomaker-touchterrain-watchdog.{service,timer}`: verifica `/main` do TouchTerrain a cada 2 minutos e reinicia o serviço automaticamente se estiver sem resposta — mitigação para hangs de rede sem timeout próprio (Earth Engine), documentada em `specs/SPEC-935-R145.md`.
-- `deploy/scripts/touchterrain_watchdog.py`: lógica do watchdog (`check_health`, `restart_service`), apenas biblioteca padrão do Python.
-- `deploy/scripts/console_error_analyzer.py`: classifica automaticamente logs de console do navegador (extensão Chrome vs. infraestrutura vs. erro real de código) — gera o `erros/erro.txt`.
-
-### Especificações SDD/TDD
-
-Este componente foi desenvolvido com Specification-Driven Development: cada funcionalidade tem uma spec em `specs/SPEC-935-R*.md` com critérios de aceitação testáveis, validados por testes automatizados antes de ser considerada concluída (protocolo do [OpenCode Ecosystem Core](https://github.com/anomalyco/opencode-ecosystem-core)):
-
-- `SPEC-935-R143.md`: revisão de infraestrutura do Geomaker (serviços, proxy, HTML)
-- `SPEC-935-R144.md`: Console Error Analyzer
-- `SPEC-935-R145.md`: estabilidade do TouchTerrain (hang de threads + watchdog)
-
 ## Laboratório digital
 
 A página `laboratorio.html` reúne dois ambientes digitais em uma interface própria do museu.
@@ -259,9 +126,7 @@ O painel calcula a extensão aproximada, mostra o JSON e permite:
 3. baixar o arquivo JSON para uso com `TouchTerrain_standalone.py`;
 4. consultar o fork `MarceloClaro/TouchTerrain_for_CAGEO` usado como fonte.
 
-O código do fork é iniciado por Gunicorn em `http://localhost:8081`. O gerador produz um ZIP que pode conter a malha STL/OBJ, o GeoTIFF e o registro do processamento. O download do JSON, isoladamente, não gera a malha: processe-o com `wsl/criar-modelo.sh` ou pelo serviço local.
-
-> **Dependências vendorizadas não incluídas neste repositório** (código de terceiros, ver `.gitignore`): `wsl/vendor/TouchTerrain_for_CAGEO`, `TouchTerrain_for_CAGEO-master/`, `ancient-earth-master/` e `tainacan.1.2.0/`. Baixe-as separadamente dos forks referenciados abaixo e coloque-as no mesmo caminho antes de rodar `wsl/setup.sh`.
+O código do fork está incluído em `wsl/vendor/TouchTerrain_for_CAGEO` e é iniciado por Gunicorn em `http://localhost:8081`. O gerador produz um ZIP que pode conter a malha STL/OBJ, o GeoTIFF e o registro do processamento. O download do JSON, isoladamente, não gera a malha: processe-o com `wsl/criar-modelo.sh` ou pelo serviço local.
 
 O `wsl/setup.sh` instala Python, GDAL, Earth Engine e as demais bibliotecas automaticamente. Para buscar dados online, o Google exige autenticação da pessoa responsável e um projeto Cloud autorizado; essa confirmação não pode ser automatizada. Um GeoTIFF local pode ser transformado sem consultar o Earth Engine. O pacote inclui `wsl/samples/SheepMtn.tif` e uma configuração de teste para comprovar o fluxo offline depois da instalação.
 
@@ -277,6 +142,26 @@ Referências:
 
 - [Fork TouchTerrain_for_CAGEO](https://github.com/MarceloClaro/TouchTerrain_for_CAGEO)
 - [Autenticação oficial do Google Earth Engine](https://developers.google.com/earth-engine/guides/auth)
+
+### Relevo em Papel 3D — sem servidor, sem WSL
+
+A página `relevo-papel.html` gera um modelo de terreno em papel (SVG, fatiamento por
+contorno empilhado) para **qualquer localização do planeta**, rodando **inteiramente no
+navegador** — ao contrário do TouchTerrain, não depende do pacote WSL nem de nenhum
+servidor do Geomaker. A pessoa usuária escolhe a localização por nome (geocodificado
+automaticamente via Nominatim/OpenStreetMap) ou por coordenadas, ajusta a resolução e o
+exagero vertical, e baixa o SVG pronto para abrir no Inkscape, organizar em folhas e cortar.
+
+- **Dados de elevação:** [Open-Meteo Elevation API](https://open-meteo.com/en/docs/elevation-api) (gratuita, sem chave, dataset Copernicus GLO-90).
+- **Geocodificação:** [Nominatim/OpenStreetMap](https://nominatim.org/) (gratuita, sem chave).
+- **Lógica:** porta client-side (`assets/relevo-papel.js`) do projeto `3d-paper-terrain-model`
+  (originalmente um script Ruby de linha de comando), com paridade matemática verificada por
+  teste automatizado — uma grade de referência 80×24 produz exatamente 192 polylines em
+  ambas as implementações.
+- **Especificação:** `docs/specs/003-relevo-papel-3d.md`.
+- **Testes:** lógica pura coberta por `npm run test:site`; fluxo completo com rede real
+  coberto por `node tests/relevo-papel-integration.mjs` (teste de integração manual, não
+  incluído no `npm test` padrão por depender de rede).
 
 ## Conectar ao Tainacan
 
