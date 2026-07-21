@@ -366,6 +366,7 @@ if ARGV.empty?
 end
 
 ARGV.each do |pasta|
+  next if pasta.start_with?('--') # ignora flags residuais (--place, --resolucao, etc.)
   if Dir.exist?(pasta)
     warn "\n--- Gerando PDF para: #{pasta} ---"
     gerar_pdf(pasta)
