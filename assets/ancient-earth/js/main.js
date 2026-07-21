@@ -100,6 +100,12 @@
     document.getElementById("explanation").textContent = EXPLAIN_MAP[year] || "";
   }
 
+  function removeMarker() {
+    if (markerMesh) { scene.remove(markerMesh); markerMesh = null; }
+    if (markerGlow) { scene.remove(markerGlow); markerGlow = null; }
+    markerLocalPos = null;
+  }
+
   function changeYear() {
     var year = parseInt(yearsAgo.value, 10);
     if (sphere) scene.remove(sphere);
@@ -319,10 +325,5 @@
       if (markerGlow) markerGlow.position.copy(markerMesh.position);
     }
 
-    function removeMarker() {
-      if (markerMesh) { scene.remove(markerMesh); markerMesh = null; }
-      if (markerGlow) { scene.remove(markerGlow); markerGlow = null; }
-      markerLocalPos = null;
-    }
   }
 }());

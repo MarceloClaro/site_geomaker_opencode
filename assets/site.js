@@ -21,7 +21,8 @@
     ["eventos", "Eventos", "eventos.html"],
     ["recursos", "Recursos", "recursos.html"],
     ["laboratorio", "Laboratório", "laboratorio.html"],
-    ["touchterrain", "TouchTerrain", "touchterrain.html"]
+    ["touchterrain", "TouchTerrain", "touchterrain.html"],
+    ["relevo-papel", "Relevo em Papel", "relevo-papel.html"]
   ];
 
   const brandMarkup = `
@@ -69,7 +70,7 @@
             <div class="footer-grid">
               <div class="footer-brand">${brandMarkup}<p>Ciência, território e memória em movimento. Uma experiência educativa que chega às escolas e comunidades.</p></div>
               <div><span class="footer-title">Explorar</span><div class="footer-links"><a href="museu.html">O Museu</a><a href="acervo.html">Acervo</a><a href="projetos.html">Projetos</a><a href="eventos.html">Agenda</a></div></div>
-              <div><span class="footer-title">Aprender</span><div class="footer-links"><a href="recursos.html">Recursos</a><a href="laboratorio.html">Laboratório digital</a><a href="touchterrain.html">TouchTerrain 3D</a><a href="publicacoes.html">Publicações</a><a href="agendar.html">Agendar visita</a></div></div>
+              <div><span class="footer-title">Aprender</span><div class="footer-links"><a href="recursos.html">Recursos</a><a href="laboratorio.html">Laboratório digital</a><a href="touchterrain.html">TouchTerrain 3D</a><a href="relevo-papel.html">Relevo em Papel</a><a href="publicacoes.html">Publicações</a><a href="agendar.html">Agendar visita</a></div></div>
               <div><span class="footer-title">Território</span><div class="footer-links"><span>Crateús, Ceará</span><span>Museu escolar e itinerante</span><span>Atendimento sob agendamento</span></div></div>
             </div>
             <div class="footer-bottom"><span>© ${new Date().getFullYear()} Museu Escolar Itinerante Geomaker</span><span>Protótipo institucional · Conteúdo sujeito a validação</span><a class="footer-admin-link" href="admin-acervo.html" aria-label="Cadastro do acervo">⚙️</a></div>
@@ -124,6 +125,7 @@
       { title: "Acervo digital", text: "coleções objetos fósseis minerais modelos 3D Sketchfab cartografia memória tecnologia Tainacan", url: "acervo.html" },
       { title: "Laboratório digital", text: "Ancient Earth Terra antiga paleogeografia relevo impressão 3D", url: "laboratorio.html" },
       { title: "TouchTerrain", text: "gerador relevo topografia STL OBJ impressão 3D DEM CAGEO Earth Engine WSL", url: "touchterrain.html" },
+      { title: "Relevo em Papel", text: "modelo topográfico papel SVG corte fatiamento contorno qualquer localização geocoding sem servidor", url: "relevo-papel.html" },
       { title: "Agendar uma visita", text: "escola exposição oficina mediação itinerante", url: "agendar.html" }
     ];
     const projects = (data.projects || []).map((item) => ({ title: item.title, text: `${item.eyebrow} ${item.description}`, url: `projetos.html#${item.slug}` }));
@@ -649,306 +651,6 @@
   function initAIGeologist() {
     // Mantida para compatibilidade — substituída pelo terminal
   }
-    const form = document.querySelector("[data-ai-geologist]");
-    if (!form) return;
-
-    const provider = form.querySelector("[data-ai-provider]");
-    const apiKey = form.querySelector("[data-ai-key]");
-    const keyToggle = form.querySelector("[data-ai-key-toggle]");
-    const keyHelp = form.querySelector("[data-ai-key-help]");
-    const specimen = form.querySelector("[data-ai-specimen]");
-    const upload = form.querySelector("[data-ai-upload]");
-    const context = form.querySelector("[data-ai-context]");
-    const submit = form.querySelector("[data-ai-submit]");
-    const clear = form.querySelector("[data-ai-clear]");
-    const preview = document.querySelector("[data-ai-preview]");
-    const previewLabel = document.querySelector("[data-ai-preview-label]");
-    const result = document.querySelector("[data-ai-result]");
-    const resultEmpty = result?.querySelector("[data-ai-result-empty]");
-    const resultContent = result?.querySelector("[data-ai-result-content]");
-    const resultProvider = result?.querySelector("[data-ai-result-provider]");
-    const resultText = result?.querySelector("[data-ai-result-text]");
-    let previewObjectUrl = "";
-
-    const providerDetails = {
-      google: {
-        label: "Google Gemini 3.5 Flash",
-        help: 'Crie uma chave no <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio <span aria-hidden="true">↗</span></a>.'
-      },
-      xai: {
-        label: "Grok 4.5 · xAI",
-        help: 'Crie uma chave no <a href="https://console.x.ai/" target="_blank" rel="noopener noreferrer">console da xAI <span aria-hidden="true">↗</span></a>.'
-      },
-      opencode: {
-        label: "OpenCode · DeepSeek V4 Flash Free",
-        help: 'Use sua chave de API do <a href="https://opencode.ai" target="_blank" rel="noopener noreferrer">OpenCode <span aria-hidden="true">↗</span></a> ou de um provedor compatível com OpenAI.'
-      },
-      "opencode-local": {
-        label: "OpenCode Local · sem chave",
-        help: 'Usa o modelo gratuito <code>opencode/deepseek-v4-flash-free</code> via CLI local no WSL. Nenhuma chave necess\u00e1ria.'
-      }
-    };
-
-    const setPreview = (src, label) => {
-      if (preview) preview.src = src;
-      if (previewLabel) previewLabel.textContent = label;
-    };
-
-    const revokePreviewUrl = () => {
-      if (!previewObjectUrl) return;
-      URL.revokeObjectURL(previewObjectUrl);
-      previewObjectUrl = "";
-    };
-
-    const opencodeConfig = document.querySelectorAll("[data-opencode-config]");
-
-    const updateProviderHelp = () => {
-      const details = providerDetails[provider?.value] || providerDetails.google;
-      if (keyHelp) keyHelp.innerHTML = details.help;
-    };
-
-    const toggleOpenCodeConfig = () => {
-      var show = provider?.value === "opencode";
-      opencodeConfig.forEach(function (el) { el.hidden = !show; });
-      if (keyHelp) keyHelp.innerHTML = providerDetails[provider?.value]?.help || "";
-      var keyRequired = provider?.value !== "opencode-local";
-      if (apiKey) apiKey.required = keyRequired;
-      if (apiKey) apiKey.placeholder = keyRequired ? "Cole sua chave somente para esta análise" : "Nenhuma chave necessária no modo local";
-    };
-
-    provider?.addEventListener("change", function () {
-      updateProviderHelp();
-      toggleOpenCodeConfig();
-    });
-    updateProviderHelp();
-    toggleOpenCodeConfig();
-    specimen?.addEventListener("change", () => {
-      if (upload?.files?.length) return;
-      const option = specimen.options[specimen.selectedIndex];
-      setPreview(specimen.value, option?.textContent || "Peça selecionada");
-    });
-
-    upload?.addEventListener("change", () => {
-      revokePreviewUrl();
-      const file = upload.files?.[0];
-      if (file) {
-        previewObjectUrl = URL.createObjectURL(file);
-        setPreview(previewObjectUrl, file.name);
-        return;
-      }
-      const option = specimen?.options[specimen.selectedIndex];
-      setPreview(specimen?.value || "", option?.textContent || "Peça selecionada");
-    });
-
-    keyToggle?.addEventListener("click", () => {
-      if (!apiKey) return;
-      const show = apiKey.type === "password";
-      apiKey.type = show ? "text" : "password";
-      keyToggle.textContent = show ? "Ocultar" : "Mostrar";
-      keyToggle.setAttribute("aria-label", show ? "Ocultar chave de API" : "Mostrar chave de API");
-      keyToggle.setAttribute("aria-pressed", String(show));
-    });
-
-    const blobToBase64 = (blob) => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.addEventListener("load", () => resolve(String(reader.result).split(",")[1] || ""));
-      reader.addEventListener("error", () => reject(new Error("Não foi possível ler a imagem.")));
-      reader.readAsDataURL(blob);
-    });
-
-    const getImage = async () => {
-      let blob = upload?.files?.[0];
-      let name = blob?.name || specimen?.options[specimen.selectedIndex]?.textContent || "Peça do acervo";
-      if (!blob) {
-        const response = await fetch(specimen.value, { cache: "force-cache" });
-        if (!response.ok) throw new Error("Não foi possível carregar a imagem selecionada.");
-        blob = await response.blob();
-      }
-      if (!/^image\/(jpeg|png)$/i.test(blob.type)) throw new Error("Use uma imagem em formato JPG ou PNG.");
-      if (blob.size > 20 * 1024 * 1024) throw new Error("A imagem ultrapassa o limite de 20 MB.");
-      return { data: await blobToBase64(blob), mimeType: blob.type, name };
-    };
-
-    const buildPrompt = (imageName) => `Você atua como geólogo, paleontólogo e museólogo em um museu escolar. Analise esta fotografia usando apenas as evidências visuais e o contexto fornecido. Não invente espécie, idade geológica, origem, composição química, autenticidade ou medidas. Quando algo não puder ser verificado pela fotografia, escreva “não determinável por imagem”. Diferencie observação, hipótese e curiosidade geral. Use português brasileiro claro e estruture a resposta exatamente nestas seis seções numeradas:\n\n1. IDENTIFICAÇÃO PROVÁVEL\nIndique a hipótese principal, alternativas plausíveis e confiança baixa, média ou alta, justificando brevemente.\n\n2. DESCRIÇÃO VISUAL OBJETIVA\nRegistre forma, cor, textura, volume aparente e elementos diagnósticos visíveis.\n\n3. ESPECIFICAÇÕES TÉCNICAS OBSERVÁVEIS\nPara mineral, considere hábito, brilho, transparência, clivagem ou fratura aparentes. Para fóssil, considere morfologia, anatomia visível, preservação e matriz. Não apresente propriedades não testadas como fatos.\n\n4. CHECKLIST DE CONFIRMAÇÃO\nListe testes não destrutivos, medições, fotografias ou consulta especializada necessários para confirmar a hipótese.\n\n5. CURIOSIDADES EDUCATIVAS\nApresente de três a cinco curiosidades relacionadas à hipótese, deixando claro que são informações gerais.\n\n6. LIMITAÇÕES E PRÓXIMO PASSO\nExplique o que a imagem não permite concluir e quando procurar um especialista.\n\nImagem: ${imageName}.\nContexto fornecido pela pessoa usuária: ${context?.value.trim() || "nenhum contexto adicional"}.`;
-
-    const extractText = (payload) => {
-      if (typeof payload?.output_text === "string" && payload.output_text.trim()) return payload.output_text.trim();
-      if (payload?.choices?.[0]?.message?.content) return payload.choices[0].message.content.trim();
-      const fragments = [];
-      const walk = (value) => {
-        if (!value) return;
-        if (Array.isArray(value)) {
-          value.forEach(walk);
-          return;
-        }
-        if (typeof value !== "object") return;
-        if ((value.type === "text" || value.type === "output_text") && typeof value.text === "string") fragments.push(value.text);
-        Object.entries(value).forEach(([key, child]) => {
-          if (key !== "text" && key !== "error" && key !== "input") walk(child);
-        });
-      };
-      walk(payload?.steps || payload?.output || payload?.candidates);
-      return [...new Set(fragments.map((part) => part.trim()).filter(Boolean))].join("\n").trim();
-    };
-
-    const requestAnalysis = async ({ selectedProvider, key, image, prompt, signal }) => {
-      const opencodeEndpoint = form.querySelector("[data-ai-opencode-endpoint]");
-      const opencodeModel = form.querySelector("[data-ai-opencode-model]");
-      const isOpenCode = selectedProvider === "opencode";
-      const isLocal = selectedProvider === "opencode-local";
-
-      var endpoint, headers, body;
-
-      if (isLocal) {
-        endpoint = "/api/chat";
-        headers = { "Content-Type": "application/json" };
-        var contextStr = "Imagem: " + (image?.name || "peça do acervo");
-        contextStr += ". O usuário enviou uma fotografia, mas este modelo é apenas texto. Responda com base no nome e contexto da peça.";
-        body = { prompt: prompt, context: contextStr };
-      } else if (isOpenCode) {
-        endpoint = (opencodeEndpoint?.value || "https://api.opencode.ai/v1/chat/completions").replace(/\/$/, "");
-        headers = { "Content-Type": "application/json", Authorization: `Bearer ${key}` };
-        body = {
-          model: opencodeModel?.value || "deepseek-v4-flash-free",
-          messages: [{
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: `data:${image.mimeType};base64,${image.data}`, detail: "high" } }
-            ]
-          }],
-          store: false
-        };
-      } else {
-        const google = selectedProvider === "google";
-        endpoint = google
-          ? "https://generativelanguage.googleapis.com/v1beta/interactions"
-          : "https://api.x.ai/v1/responses";
-        headers = google
-          ? { "Content-Type": "application/json", "x-goog-api-key": key }
-          : { "Content-Type": "application/json", Authorization: `Bearer ${key}` };
-        body = google
-          ? {
-              model: "gemini-3.5-flash",
-              input: [
-                { type: "text", text: prompt },
-                { type: "image", data: image.data, mime_type: image.mimeType }
-              ],
-              store: false
-            }
-          : {
-              model: "grok-4.5",
-              input: [{
-                role: "user",
-                content: [
-                  { type: "input_image", image_url: `data:${image.mimeType};base64,${image.data}`, detail: "high" },
-                  { type: "input_text", text: prompt }
-                ]
-              }],
-              store: false
-            };
-      }
-
-      var response;
-      if (isLocal) {
-        response = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-          signal: signal
-        });
-      } else {
-        response = await fetch(endpoint, {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify(body),
-          signal: signal,
-          referrerPolicy: "no-referrer"
-        });
-      }
-
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        const message = payload?.error?.detail || payload?.error?.message || payload?.message || `O provedor respondeu com o código ${response.status}.`;
-        throw new Error(message);
-      }
-
-      var text;
-      if (isLocal) {
-        text = payload?.text || "";
-        if (!text) throw new Error(payload?.error || "O provedor respondeu, mas não devolveu um texto de análise.");
-      } else {
-        text = extractText(payload);
-        if (!text) throw new Error("O provedor respondeu, mas não devolveu um texto de análise.");
-      }
-      return text;
-    };
-
-    const showResult = (text, isError = false) => {
-      if (!result || !resultText || !resultContent || !resultEmpty) return;
-      resultEmpty.hidden = true;
-      resultContent.hidden = false;
-      result.classList.toggle("has-error", isError);
-      resultText.textContent = text;
-      if (resultProvider) resultProvider.textContent = isError ? "Não foi possível analisar" : (providerDetails[provider?.value]?.label || "IA");
-    };
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!form.reportValidity()) return;
-      const key = apiKey?.value.trim();
-      const isLocal = provider?.value === "opencode-local";
-      if (!isLocal && !key) return;
-
-      const originalButtonText = submit.innerHTML;
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 90000);
-      submit.disabled = true;
-      submit.textContent = "Analisando imagem…";
-      result?.setAttribute("aria-busy", "true");
-      result?.classList.add("is-loading");
-
-      try {
-        const image = await getImage();
-        const prompt = buildPrompt(image.name);
-        const text = await requestAnalysis({ selectedProvider: provider.value, key, image, prompt, signal: controller.signal });
-        showResult(text);
-      } catch (error) {
-        const networkHint = error?.name === "AbortError"
-          ? "A análise excedeu 90 segundos. Tente novamente com uma imagem menor."
-          : error instanceof TypeError
-            ? "A chamada foi bloqueada ou a conexão falhou. Em um site público, configure um proxy seguro no servidor e tente novamente."
-            : error?.message || "Não foi possível concluir a análise.";
-        showResult(networkHint, true);
-      } finally {
-        window.clearTimeout(timeout);
-        submit.disabled = false;
-        submit.innerHTML = originalButtonText;
-        result?.setAttribute("aria-busy", "false");
-        result?.classList.remove("is-loading");
-      }
-    });
-
-    clear?.addEventListener("click", () => {
-      form.reset();
-      revokePreviewUrl();
-      updateProviderHelp();
-      if (apiKey) apiKey.type = "password";
-      if (keyToggle) {
-        keyToggle.textContent = "Mostrar";
-        keyToggle.setAttribute("aria-label", "Mostrar chave de API");
-        keyToggle.setAttribute("aria-pressed", "false");
-      }
-      setPreview("assets/acervo/amonite-vista-a.jpg", "Amonite · vista A");
-      if (resultEmpty) resultEmpty.hidden = false;
-      if (resultContent) resultContent.hidden = true;
-      if (result) result.classList.remove("has-error", "is-loading");
-      if (resultText) resultText.textContent = "";
-      apiKey?.focus();
-    });
-
-    updateProviderHelp();
-  }
 
   function initTerrainLab() {
     const form = document.querySelector("[data-terrain-form]");
@@ -1108,6 +810,298 @@
     update();
   }
 
+  function initRelevoPapel() {
+    const form = document.querySelector("[data-relevo-form]");
+    if (!form || !window.RelevoPapel) return;
+
+    const RP = window.RelevoPapel;
+    const modeInputs = [...form.querySelectorAll("[data-relevo-modo]")];
+    const nomeBlock = form.querySelector("[data-relevo-modo-nome]");
+    const bboxBlock = form.querySelector("[data-relevo-modo-bbox]");
+    const validation = form.querySelector("[data-relevo-validation]");
+    const submitButton = form.querySelector("[data-relevo-submit]");
+    const statusBox = document.querySelector("[data-relevo-status]");
+    const previewBox = document.querySelector("[data-relevo-preview]");
+    const previewImg = document.querySelector("[data-relevo-preview-img]");
+    const previewEmpty = document.querySelector("[data-relevo-preview-empty]");
+    const downloadLink = document.querySelector("[data-relevo-download]");
+    const metaBox = document.querySelector("[data-relevo-meta]");
+    const numberFormat = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 });
+
+    let templateTextPromise = null;
+    let currentObjectUrl = "";
+
+    const field = (name) => form.elements.namedItem(name);
+    const currentMode = () => modeInputs.find((input) => input.checked)?.value || "nome";
+
+    const updateModeVisibility = () => {
+      const byName = currentMode() === "nome";
+      if (nomeBlock) nomeBlock.hidden = !byName;
+      if (bboxBlock) bboxBlock.hidden = byName;
+    };
+    modeInputs.forEach((input) => input.addEventListener("change", updateModeVisibility));
+    updateModeVisibility();
+
+    const loadTemplate = () => {
+      if (!templateTextPromise) {
+        templateTextPromise = fetch("assets/relevo-papel/template-cut.svg").then((response) => {
+          if (!response.ok) throw new Error(`Não foi possível carregar o template SVG (HTTP ${response.status}).`);
+          return response.text();
+        });
+      }
+      return templateTextPromise;
+    };
+
+    const setValidation = (message, isError) => {
+      if (!validation) return;
+      validation.textContent = message;
+      validation.classList.toggle("has-error", Boolean(isError));
+    };
+
+    const appendStatus = (text) => {
+      if (!statusBox) return;
+      const line = document.createElement("div");
+      line.className = "relevo-status-line";
+      line.textContent = text;
+      statusBox.appendChild(line);
+      statusBox.scrollTop = statusBox.scrollHeight;
+    };
+
+    const clearStatus = () => {
+      if (statusBox) statusBox.innerHTML = "";
+    };
+
+    const revokeCurrentUrl = () => {
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = "";
+      }
+    };
+
+    const buildOptionsFromForm = () => {
+      const mode = currentMode();
+      const opts = {
+        latSteps: Number(field("latSteps").value),
+        lonSteps: Number(field("lonSteps").value),
+        zCms: Number(field("zCms").value),
+        lengthCm: Number(field("lengthCm").value)
+      };
+      if (mode === "nome") {
+        opts.place = field("place").value.trim();
+        opts.sizeKm = Number(field("sizeKm").value);
+        if (!opts.place) throw new Error("Informe o nome de um lugar (ex.: “Pão de Açúcar, Rio de Janeiro”).");
+      } else {
+        const lat0 = Number(field("lat0").value);
+        const lon0 = Number(field("lon0").value);
+        const lat1 = Number(field("lat1").value);
+        const lon1 = Number(field("lon1").value);
+        opts.bbox = [lat0, lon0, lat1, lon1];
+      }
+      return opts;
+    };
+
+    const onProgress = (p) => {
+      if (p.phase === "geocoding") appendStatus("🔎 Procurando o lugar via Nominatim/OpenStreetMap…");
+      else if (p.phase === "elevation-start") {
+        const [lat0, lon0, lat1, lon1] = p.bbox;
+        appendStatus(`📍 Área definida: lat ${lat0.toFixed(4)}..${lat1.toFixed(4)}, lon ${lon0.toFixed(4)}..${lon1.toFixed(4)}`);
+        appendStatus("⛰️ Obtendo elevações reais via Open-Meteo (gratuito, sem chave)…");
+      } else if (p.phase === "elevation-progress") {
+        appendStatus(`  lote ${p.batch}/${p.totalBatches} — ${p.pointsDone}/${p.pointsTotal} pontos`);
+      }
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      let options;
+      try {
+        options = buildOptionsFromForm();
+      } catch (error) {
+        setValidation(error.message, true);
+        return;
+      }
+
+      revokeCurrentUrl();
+      clearStatus();
+      setValidation("Gerando modelo — isso pode levar de alguns segundos a poucos minutos, dependendo da resolução escolhida.", false);
+      submitButton.disabled = true;
+      submitButton.dataset.originalText = submitButton.dataset.originalText || submitButton.textContent;
+      submitButton.textContent = "Gerando…";
+      previewBox?.setAttribute("aria-busy", "true");
+      if (downloadLink) downloadLink.hidden = true;
+
+      // Limpar SVGs anteriores
+      const pageSvgs = []; // { svg, url }
+      let currentPage = 0;
+      if (window.__relevoUrls) window.__relevoUrls.forEach(u => URL.revokeObjectURL(u));
+      window.__relevoUrls = [];
+
+      try {
+        const templateText = await loadTemplate();
+        options.templateText = templateText;
+        const result = await RP.generateModel(options, onProgress);
+
+        const safeName = (result.placeInfo?.displayName || "relevo-papel").split(",")[0]
+          .toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "relevo-papel";
+
+        // Salvar no servidor (subpasta em geracoes/) — disparo assincrono,
+        // nao bloqueia a interface: o usuario ja pode navegar e baixar.
+        (async () => {
+          try {
+            const resp = await fetch("/api/relevo/salvar", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                paginas: result.svgs,
+                localizadores: result.locatorSvg || "",
+                metadata: {
+                  safeName: safeName,
+                  lugar: result.placeInfo?.displayName || "Coordenadas informadas",
+                  latSteps: options.latSteps,
+                  lonSteps: options.lonSteps,
+                  eleMin: Math.round(result.eleMin),
+                  eleMax: Math.round(result.eleMax),
+                  totalPages: result.totalPages,
+                },
+              }),
+            });
+            const data = await resp.json();
+            if (data.status === "ok") {
+              appendStatus(`💾 Salvo em servidor: geracoes/${data.pasta}/ (${data.total} arquivos)`);
+            }
+          } catch (_err) {
+            // Falha ao salvar no servidor nao impede o uso local
+            appendStatus("ℹ️ Não foi possível salvar no servidor (download local disponível).");
+          }
+        })();
+
+        // Criar object URLs para cada pagina
+        for (let i = 0; i < result.svgs.length; i++) {
+          const blob = new Blob([result.svgs[i]], { type: "image/svg+xml" });
+          const url = URL.createObjectURL(blob);
+          window.__relevoUrls.push(url);
+          pageSvgs.push({ svg: result.svgs[i], url });
+        }
+        currentPage = 0;
+
+        // Exibir preview da primeira pagina
+        if (previewImg && pageSvgs.length > 0) {
+          previewImg.src = pageSvgs[0].url;
+          previewImg.hidden = false;
+        }
+        if (previewEmpty) previewEmpty.hidden = true;
+
+        // Download individual (backward compat - baixa todas paginas em 1 SVG concatenado)
+        if (downloadLink && result.svgs.length === 1) {
+          downloadLink.href = pageSvgs[0].url;
+          downloadLink.download = `${safeName}.svg`;
+          downloadLink.hidden = false;
+        }
+
+        // Navegacao entre paginas
+        const pagination = document.querySelector("[data-relevo-pagination]");
+        const pageIndicator = document.querySelector("[data-relevo-page-indicator]");
+        const prevBtn = document.querySelector("[data-relevo-prev]");
+        const nextBtn = document.querySelector("[data-relevo-next]");
+
+        function updatePageView() {
+          if (previewImg && pageSvgs[currentPage]) {
+            previewImg.src = pageSvgs[currentPage].url;
+          }
+          if (pageIndicator) {
+            pageIndicator.textContent = `Página ${currentPage + 1} de ${pageSvgs.length}`;
+          }
+          if (prevBtn) prevBtn.disabled = currentPage <= 0;
+          if (nextBtn) nextBtn.disabled = currentPage >= pageSvgs.length - 1;
+          // Destacar botao de download da pagina atual
+          document.querySelectorAll("[data-relevo-download-page]").forEach((btn, idx) => {
+            btn.classList.toggle("button-primary", idx === currentPage);
+            btn.classList.toggle("button-outline", idx !== currentPage);
+          });
+        }
+
+        if (pagination && pageSvgs.length > 1) {
+          pagination.hidden = false;
+          prevBtn.onclick = () => { if (currentPage > 0) { currentPage--; updatePageView(); }};
+          nextBtn.onclick = () => { if (currentPage < pageSvgs.length - 1) { currentPage++; updatePageView(); }};
+          updatePageView();
+        } else if (pagination) {
+          pagination.hidden = true;
+        }
+
+        // Botoes de download por pagina
+        const downloadsContainer = document.querySelector("[data-relevo-downloads]");
+        if (downloadsContainer) {
+          downloadsContainer.innerHTML = "";
+          downloadsContainer.hidden = false;
+          for (let i = 0; i < pageSvgs.length; i++) {
+            const a = document.createElement("a");
+            a.className = "button relevo-download-page " + (i === 0 ? "button-primary" : "button-outline");
+            a.href = pageSvgs[i].url;
+            a.download = `${safeName}-pagina-${i + 1}.svg`;
+            a.textContent = `Pág. ${i + 1} ↓`;
+            a.setAttribute("data-relevo-download-page", "");
+            downloadsContainer.appendChild(a);
+          }
+          // Botao para baixar TUDO (zip simples - concatena com separador)
+          if (pageSvgs.length > 1) {
+            const allBlob = new Blob(
+              pageSvgs.map((ps, i) => `<!-- Página ${i + 1} de ${pageSvgs.length} -->\n${ps.svg}`),
+              { type: "image/svg+xml" }
+            );
+            const allUrl = URL.createObjectURL(allBlob);
+            window.__relevoUrls.push(allUrl);
+            const allA = document.createElement("a");
+            allA.className = "button button-outline relevo-download-page";
+            allA.href = allUrl;
+            allA.download = `${safeName}-todas-as-paginas.svg`;
+            allA.textContent = "Todas ↓";
+            downloadsContainer.appendChild(allA);
+          }
+
+          // Botao para baixar LOCALIZADORES (locators.svg — estilo polana/)
+          if (result.locatorSvg) {
+            const locBlob = new Blob([result.locatorSvg], { type: "image/svg+xml" });
+            const locUrl = URL.createObjectURL(locBlob);
+            window.__relevoUrls.push(locUrl);
+            const locA = document.createElement("a");
+            locA.className = "button button-outline relevo-download-page";
+            locA.href = locUrl;
+            locA.download = `${safeName}-localizadores.svg`;
+            locA.textContent = "🗺 Localizadores ↓";
+            locA.title = "Mapa de localização com divisões entre páginas (estilo polana/)";
+            downloadsContainer.appendChild(locA);
+          }
+        }
+
+        // Metadados
+        if (metaBox) {
+          metaBox.innerHTML = `
+            <div><span>Local</span><strong>${escapeHtml(result.placeInfo?.displayName || "Coordenadas informadas manualmente")}</strong></div>
+            <div><span>Elevação</span><strong>${numberFormat.format(result.eleMin)} – ${numberFormat.format(result.eleMax)} m</strong></div>
+            <div><span>Peças</span><strong>${result.verticalSlices}V + ${result.horizontalSlices}H = ${result.verticalSlices + result.horizontalSlices} peças encaixáveis</strong></div>
+            <div><span>Páginas</span><strong>${result.totalPages} folhas A4</strong></div>
+            <div><span>Localizadores</span><strong>1 folha A4 com mapa de calor + índice</strong></div>`;
+        }
+
+        appendStatus(`✅ Modelo gerado: ${result.verticalSlices}V + ${result.horizontalSlices}H = ${result.verticalSlices + result.horizontalSlices} peças em ${result.totalPages} página${result.totalPages > 1 ? 's' : ''}.`);
+        setValidation(pageSvgs.length > 1
+          ? `Modelo gerado em ${pageSvgs.length} páginas. Navegue e baixe cada folha individualmente.`
+          : "Modelo gerado. Baixe o SVG.", false);
+      } catch (error) {
+        appendStatus(`⚠ ${error.message}`);
+        setValidation(error.message, true);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = submitButton.dataset.originalText;
+        previewBox?.setAttribute("aria-busy", "false");
+      }
+    });
+  }
+
   renderChrome();
   initHeader();
   initSearch();
@@ -1123,5 +1117,6 @@
   initTainacanAccess();
   initTerminal();
   initTerrainLab();
+  initRelevoPapel();
   initReveal();
 })();
